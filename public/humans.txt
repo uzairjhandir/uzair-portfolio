@@ -1,0 +1,12 @@
+/* TEAM */
+  Developer: Muhammad Uzair
+  Site: https://uzair.dev
+  Twitter: @uzair
+  Location: Global
+
+/* SITE */
+  Last update: 2026/07/09
+  Language: English
+  Doctype: HTML5
+  IDE: Cursor / VSCode
+  Framework: Next.js 16 (Turbopack)
