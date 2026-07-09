@@ -1,64 +1,53 @@
-# Muhammad Uzair — Portfolio v1.0.0
+# Muhammad Uzair - Premium Personal Portfolio
 
-A premium, agency-level personal portfolio website engineered for performance, SEO, and conversion. Built with the Next.js 16 App Router and Turbopack.
+A premium, modern, and high-performance personal portfolio built with Next.js 15 (App Router), Tailwind CSS, Framer Motion, and TypeScript. Designed for a Full Stack Web Developer and Linux Server Administrator to showcase expertise, services, and featured projects.
 
-## 🚀 Status: Production Ready (v1.0.0)
+## 🚀 Tech Stack
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router & Turbopack)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Form Handling:** React Hook Form + Zod
+- **Email/API:** Custom Next.js Route with Nodemailer
 
-This repository contains the frozen source code for v1.0.0. The architecture is complete, and the design system is fully implemented.
+## 🛠️ Features
+- **Glassmorphism UI:** Premium aesthetic with dark navy backgrounds and cyan/blue accents.
+- **Micro-Animations:** Smooth hover states, scroll reveals, and physics-based interactions.
+- **Dynamic Contact Form:** Secure server-side validation, rate limiting, honeypot spam protection, and dual-email dispatch (Admin + User Auto-reply).
+- **SEO Optimized:** Semantic HTML, JSON-LD schemas, dynamically generated Open Graph images, and comprehensive meta tags.
+- **Responsive:** Fluid typography and meticulously crafted layouts for mobile, tablet, and desktop views.
 
-### Technology Stack
-- **Framework:** Next.js 16 (App Router)
-- **Styling:** Tailwind CSS + Glassmorphism 
-- **Animations:** Framer Motion
-- **Icons:** Lucide React & Simple Icons
-- **Content:** Local Data Providers (Case Studies & Blog)
-- **SEO:** Automated JSON-LD Schema, Dynamic Sitemap, Robots.txt
-- **Analytics:** Google Analytics 4, Microsoft Clarity, Meta Pixel
-- **Chat:** Tawk.to / Crisp (Dynamic Environment Variable loading)
+## 💻 Local Development
 
-## 📦 Environment Setup
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
 
-To run this project locally, copy the `.env.example` to `.env.local` and populate the fields:
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-NEXT_PUBLIC_SITE_URL=https://uzair.dev
+3. Setup Environment Variables:
+   Copy `.env.example` to `.env.local` and fill in the required keys. (See `ENVIRONMENT.md` for details).
 
-# Analytics (Optional but Recommended)
-NEXT_PUBLIC_GA_ID=
-NEXT_PUBLIC_CLARITY_ID=
-NEXT_PUBLIC_META_PIXEL_ID=
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-# Webmaster Verification (Optional)
-GOOGLE_SITE_VERIFICATION=
-BING_SITE_VERIFICATION=
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-# Chat Widgets (Set NEXT_PUBLIC_CHAT_PROVIDER to 'tawk' or 'crisp')
-NEXT_PUBLIC_CHAT_PROVIDER=tawk
-NEXT_PUBLIC_TAWK_PROPERTY_ID=
-NEXT_PUBLIC_TAWK_WIDGET_ID=
-NEXT_PUBLIC_CRISP_WEBSITE_ID=
-```
+## 📜 Documentation Index
+For deployment and maintenance, refer to the following documentation:
+- [Deployment Guide](DEPLOYMENT.md)
+- [Server Setup](SERVER_SETUP.md)
+- [SMTP Configuration](SMTP_SETUP.md)
+- [Environment Variables](ENVIRONMENT.md)
+- [Backup Strategy](BACKUP.md)
+- [Changelog](CHANGELOG.md)
 
-## 🛠️ Development
-
-```bash
-# Install dependencies
-npm install
-
-# Run the development server
-npm run dev
-
-# Build for production
-npm run build
-npm start
-```
-
-## 📝 Roadmap (Post v1.0.0)
-
-The next steps for this repository include:
-- **v1.0.1** - Content integration (real images, real resume PDF, real testimonials).
-- **v1.1.0** - Potential API integrations (Resend/EmailJS for contact form).
-- **v2.0.0** - Headless CMS integration and Client Portal.
-
-## 📄 License
-MIT License
+## ©️ License
+Private. All rights reserved.
