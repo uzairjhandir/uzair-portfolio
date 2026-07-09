@@ -7,6 +7,8 @@ import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 
+import { Logo } from "@/components/ui/Logo";
+
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "About", href: "/#about" },
@@ -51,8 +53,8 @@ export function Navbar() {
         }`}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-heading font-bold text-white hover-trigger transition-transform hover:scale-105">
-            Uzair<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">.</span>
+          <Link href="/" className="hover-trigger transition-transform hover:scale-105" aria-label="Home">
+            <Logo variant="full" className="h-10" />
           </Link>
 
           {/* Desktop Nav */}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import { Logo } from "@/components/ui/Logo";
 
 export function Loader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -53,40 +54,12 @@ export function Loader() {
           <div className="relative z-10 flex flex-col items-center">
             {/* Logo Animation */}
             <motion.div 
-              className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-8 overflow-hidden flex"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="mb-12"
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <motion.span 
-                initial={{ y: 50, opacity: 0 }} 
-                animate={{ y: 0, opacity: 1 }} 
-                transition={{ duration: 0.8, delay: 0.2, ease: "backOut" }}
-              >
-                U
-              </motion.span>
-              <motion.span 
-                initial={{ y: 50, opacity: 0 }} 
-                animate={{ y: 0, opacity: 1 }} 
-                transition={{ duration: 0.8, delay: 0.3, ease: "backOut" }}
-                className="text-accent"
-              >
-                z
-              </motion.span>
-              <motion.span 
-                initial={{ y: 50, opacity: 0 }} 
-                animate={{ y: 0, opacity: 1 }} 
-                transition={{ duration: 0.8, delay: 0.4, ease: "backOut" }}
-              >
-                air
-              </motion.span>
-              <motion.span 
-                initial={{ y: 50, opacity: 0 }} 
-                animate={{ y: 0, opacity: 1 }} 
-                transition={{ duration: 0.8, delay: 0.5, ease: "backOut" }}
-                className="text-primary"
-              >
-                .
-              </motion.span>
+              <Logo variant="monogram" className="w-24 h-24 drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
             </motion.div>
 
             {/* Progress Bar Container */}

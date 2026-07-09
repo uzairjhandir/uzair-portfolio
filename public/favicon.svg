@@ -1,0 +1,24 @@
+
+<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mu-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#06B6D4" />
+      <stop offset="100%" stopColor="#3B82F6" />
+    </linearGradient>
+  </defs>
+  <path 
+    d="M15 80 V40 L35 60 L55 40 V80" 
+    stroke="url(#mu-grad)" 
+    stroke-width="10" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <path 
+    d="M75 40 V65 A15 15 0 0 0 105 65 V40" 
+    stroke="url(#mu-grad)" 
+    stroke-width="10" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <circle cx="110" cy="90" r="6" fill="url(#mu-grad)" />
+</svg>

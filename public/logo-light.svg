@@ -1,0 +1,21 @@
+
+<svg viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mu-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#06B6D4" />
+      <stop offset="100%" stopColor="#3B82F6" />
+    </linearGradient>
+  </defs>
+  <!-- Monogram -->
+  <g transform="translate(0, 0)">
+    <path d="M15 80 V40 L35 60 L55 40 V80" stroke="url(#mu-grad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M75 40 V65 A15 15 0 0 0 105 65 V40" stroke="url(#mu-grad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="90" r="6" fill="url(#mu-grad)" />
+  </g>
+  
+  <!-- Wordmark -->
+  <g transform="translate(140, 60)" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="32">
+    <text x="0" y="0" fill="#000000" letter-spacing="2">MUHAMMAD</text>
+    <text x="0" y="24" fill="#888888" letter-spacing="8" font-size="20">UZAIR</text>
+  </g>
+</svg>
