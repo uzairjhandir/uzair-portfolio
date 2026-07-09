@@ -9,6 +9,7 @@ interface MagneticButtonProps {
   onClick?: () => void;
   variant?: "primary" | "secondary" | "outline" | "ghost";
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 export function MagneticButton({
@@ -17,6 +18,7 @@ export function MagneticButton({
   onClick,
   variant = "primary",
   type = "button",
+  disabled = false,
 }: MagneticButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -45,13 +47,14 @@ export function MagneticButton({
   return (
     <motion.button
       ref={buttonRef}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      onClick={onClick}
+      onMouseMove={disabled ? undefined : handleMouse}
+      onMouseLeave={disabled ? undefined : reset}
+      onClick={disabled ? undefined : onClick}
       type={type}
+      disabled={disabled}
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className={`${baseStyles} ${variants[variant]} ${className}`}
+      className={`${baseStyles} ${variants[variant]} ${disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""} ${className}`}
     >
       <span className="relative z-10 flex items-center space-x-2">{children}</span>
     </motion.button>
