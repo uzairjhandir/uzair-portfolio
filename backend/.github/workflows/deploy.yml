@@ -1,0 +1,23 @@
+name: Production Deploy
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Deploy to Server (SSH/Envoyer/Vapor)
+      run: |
+        echo "Executing Deployment Pipeline via artisan"
+        # ssh user@server "cd /var/www/html && php artisan release:go-live"

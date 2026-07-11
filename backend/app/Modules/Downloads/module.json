@@ -1,0 +1,76 @@
+{
+  "name": "Downloads",
+  "version": "1.0",
+  "description": "Digital asset / download manager — PDFs, ZIPs, executables, videos. Supports gated, premium, and free downloads.",
+  "namespace": "App\\Modules\\Downloads",
+
+  "dependencies": {
+    "core": [
+      "Core.Content",
+      "Core.Media",
+      "Core.Taxonomy",
+      "Core.SEO",
+      "Core.Metrics",
+      "Core.ContentRelations"
+    ],
+    "modules": []
+  },
+
+  "minimum_core_version": "1.0",
+  "routes": true,
+  "migrations": true,
+  "seeders": [],
+  "policies": ["DownloadPolicy"],
+
+  "events": [
+    "GatedDownloadRequested"
+  ],
+
+  "jobs": [],
+  "listeners": [],
+  "commands": [],
+
+  "permissions": [
+    "download.viewAny",
+    "download.view",
+    "download.create",
+    "download.update",
+    "download.delete",
+    "download.publish",
+    "download.unpublish",
+    "download.restore",
+    "download.duplicate"
+  ],
+
+  "public_routes": [
+    "GET  /downloads",
+    "GET  /downloads/{slug}",
+    "GET  /api/v1/dl/{token}"
+  ],
+
+  "api_routes": [
+    "GET    /api/v1/downloads",
+    "POST   /api/v1/downloads",
+    "GET    /api/v1/downloads/{uuid}",
+    "PUT    /api/v1/downloads/{uuid}",
+    "DELETE /api/v1/downloads/{uuid}",
+    "POST   /api/v1/downloads/{uuid}/publish",
+    "POST   /api/v1/downloads/{uuid}/unpublish",
+    "POST   /api/v1/downloads/{uuid}/preview",
+    "POST   /api/v1/downloads/{uuid}/heartbeat",
+    "GET    /api/v1/downloads/{uuid}/revisions",
+    "GET    /api/v1/downloads/featured",
+    "GET    /api/v1/downloads/popular",
+    "POST   /api/v1/downloads/{uuid}/serve"
+  ],
+
+  "search": {
+    "enabled": true,
+    "provider": "content",
+    "type": "download",
+    "visibility": "public",
+    "boost": 25,
+    "index_version": 1,
+    "schema_version": 1
+  }
+}

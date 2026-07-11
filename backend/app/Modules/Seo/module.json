@@ -1,0 +1,113 @@
+{
+  "name": "SEO & Routing Infrastructure",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Seo",
+  "provider": "App\\Modules\\Seo\\SeoServiceProvider",
+  "description": "Complete SEO infrastructure: Redirect Manager, URL Rewrites, Sitemap Engine, robots.txt, Canonical URLs, JSON-LD Schema Builder, SEO Health Checker, and automatic Slug → Redirect pipeline.",
+
+  "sub_modules": [
+    "Redirects",
+    "UrlRewrites",
+    "Sitemap",
+    "Robots",
+    "Canonical",
+    "Schema",
+    "Health"
+  ],
+
+  "middleware": {
+    "before_routing": ["CheckUrlRewritesMiddleware"],
+    "after_404":      ["CheckRedirectsMiddleware"]
+  },
+
+  "singletons": [
+    "SitemapEngine",
+    "CanonicalService",
+    "SchemaBuilder",
+    "SeoHealthChecker"
+  ],
+
+  "sitemap_sources": [
+    "PagesSitemapSource",
+    "BlogSitemapSource",
+    "PortfolioSitemapSource",
+    "CaseStudySitemapSource",
+    "DownloadsSitemapSource",
+    "TaxonomySitemapSource",
+    "AuthorSitemapSource"
+  ],
+
+  "schema_types": [
+    "FAQPageSchema",
+    "ArticleSchema",
+    "ProjectSchema",
+    "DigitalDocumentSchema",
+    "PersonSchema",
+    "OrganizationSchema",
+    "BreadcrumbSchema"
+  ],
+
+  "jobs": [
+    "GenerateSitemapJob",
+    "CreateRedirectFromSlugJob",
+    "IncrementRedirectHitJob",
+    "RunSeoAuditJob"
+  ],
+
+  "queue": "seo",
+
+  "events": [
+    {
+      "event": "App\\Events\\ContentPublished",
+      "listener": "App\\Modules\\Seo\\Listeners\\SeoRoutingListener@handlePublished"
+    },
+    {
+      "event": "App\\Events\\ContentArchived",
+      "listener": "App\\Modules\\Seo\\Listeners\\SeoRoutingListener@handleArchived"
+    }
+  ],
+
+  "public_routes": [
+    "GET /robots.txt",
+    "GET /sitemap.xml",
+    "GET /sitemap-index.xml",
+    "GET /sitemap-{section}.xml",
+    "GET /api/v1/redirects/export"
+  ],
+
+  "admin_routes": [
+    "GET|POST|PUT|DELETE /api/v1/admin/redirects",
+    "POST /api/v1/admin/redirects/bulk",
+    "GET|POST|PUT|DELETE /api/v1/admin/url-rewrites",
+    "POST /api/v1/admin/url-rewrites/bulk",
+    "POST /api/v1/admin/url-rewrites/{uuid}/test",
+    "POST /api/v1/admin/seo/sitemap/rebuild",
+    "GET /api/v1/admin/seo/health/overview",
+    "GET /api/v1/admin/seo/health/low-scores",
+    "GET /api/v1/admin/seo/health/{type}/{uuid}",
+    "POST /api/v1/admin/seo/health/audit"
+  ],
+
+  "storage": {
+    "sitemaps": "storage/app/sitemaps/"
+  },
+
+  "tables": [
+    "redirects",
+    "url_rewrites",
+    "sitemap_entries",
+    "seo_metadata (extended)"
+  ],
+
+  "future_extensions": [
+    "hreflang (locale system)",
+    "image sitemap",
+    "news sitemap",
+    "video sitemap",
+    "ProductSchema",
+    "CourseSchema",
+    "EventSchema",
+    "VideoObjectSchema",
+    "JobPostingSchema"
+  ]
+}

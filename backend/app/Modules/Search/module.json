@@ -1,0 +1,77 @@
+{
+  "name": "Search Engine",
+  "version": "2.0",
+  "description": "Unified driver-based search engine with hybrid Indexed + Live provider architecture, weighted scoring, faceted aggregations, async queue pipeline, and Ctrl+K admin global search.",
+  "namespace": "App\\Modules\\Search",
+
+  "dependencies": {
+    "core": [],
+    "modules": []
+  },
+
+  "minimum_core_version": "1.0",
+  "routes": true,
+  "migrations": true,
+  "seeders": [],
+  "policies": [],
+
+  "events": [],
+
+  "jobs": [
+    "App\\Modules\\Search\\Jobs\\IndexSearchDocumentJob",
+    "App\\Modules\\Search\\Jobs\\RemoveSearchDocumentJob",
+    "App\\Modules\\Search\\Jobs\\RebuildSearchIndexJob"
+  ],
+  
+  "listeners": [
+    {
+      "event": "App\\Events\\ContentPublished",
+      "listener": "App\\Modules\\Search\\Listeners\\SearchIndexListener@handlePublished"
+    },
+    {
+      "event": "App\\Events\\ContentUpdated",
+      "listener": "App\\Modules\\Search\\Listeners\\SearchIndexListener@handleUpdated"
+    },
+    {
+      "event": "App\\Events\\ContentDeleted",
+      "listener": "App\\Modules\\Search\\Listeners\\SearchIndexListener@handleDeleted"
+    }
+  ],
+  
+  "commands": [],
+
+  "permissions": [
+    "search.admin"
+  ],
+
+  "providers": [
+    "App\\Modules\\Search\\Providers\\ContentSearchProvider",
+    "App\\Modules\\Search\\Providers\\CRMSearchProvider",
+    "App\\Modules\\Search\\Providers\\UserSearchProvider",
+    "App\\Modules\\Search\\Providers\\MediaSearchProvider",
+    "App\\Modules\\Search\\Providers\\SettingsSearchProvider"
+  ],
+
+  "public_routes": [
+    "GET /api/v1/search",
+    "GET /api/v1/search/suggest",
+    "GET /api/v1/search/related"
+  ],
+
+  "api_routes": [
+    "POST   /api/v1/search/rebuild",
+    "DELETE /api/v1/search/index",
+    "GET    /api/v1/admin/search",
+    "GET    /api/v1/admin/search/health"
+  ],
+
+  "search": {
+    "enabled": false,
+    "provider": "system",
+    "type": "search_engine",
+    "visibility": "system",
+    "boost": 0,
+    "index_version": 1,
+    "schema_version": 1
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "Newsletter",
+  "version": "1.0",
+  "description": "Newsletter subscription, list management, and campaign delivery.",
+  "namespace": "App\\Modules\\Newsletter",
+
+  "note": "Newsletter is NOT a content domain. Does not extend AbstractContentController.",
+
+  "dependencies": {
+    "core": [],
+    "modules": ["CRM"]
+  },
+
+  "minimum_core_version": "1.0",
+  "routes": true,
+  "migrations": true,
+  "seeders": ["NewsletterDefaultListSeeder"],
+  "policies": [],
+
+  "events": [
+    "NewsletterSubscribeRequested",
+    "NewsletterSubscribeConfirmed",
+    "NewsletterUnsubscribed",
+    "CampaignScheduled",
+    "CampaignSent"
+  ],
+
+  "jobs": [
+    "SendCampaignJob",
+    "SendConfirmationEmailJob"
+  ],
+
+  "listeners": [],
+
+  "commands": [
+    "newsletter:send-scheduled"
+  ],
+
+  "permissions": [
+    "newsletter.viewAny",
+    "newsletter.create",
+    "newsletter.update",
+    "newsletter.delete",
+    "newsletter.send",
+    "newsletter.export"
+  ],
+
+  "public_routes": [
+    "POST /api/v1/newsletter/subscribe",
+    "GET  /api/v1/newsletter/confirm/{token}",
+    "GET  /api/v1/newsletter/unsubscribe/{token}",
+    "GET  /api/v1/newsletter/lists"
+  ],
+
+  "api_routes": [
+    "GET  /api/v1/admin/newsletter/subscribers",
+    "GET  /api/v1/admin/newsletter/campaigns",
+    "POST /api/v1/admin/newsletter/campaigns"
+  ]
+}

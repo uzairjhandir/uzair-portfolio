@@ -1,0 +1,70 @@
+{
+  "name": "CaseStudy",
+  "version": "1.0",
+  "description": "Case Study engine — narrative project stories linked to Portfolio items.",
+  "namespace": "App\\Modules\\CaseStudy",
+
+  "dependencies": {
+    "core": [
+      "Core.Content",
+      "Core.Taxonomy",
+      "Core.Media",
+      "Core.SEO",
+      "Core.Metrics",
+      "Core.ContentRelations"
+    ],
+    "modules": ["Portfolio"]
+  },
+
+  "routes": true,
+  "migrations": true,
+  "seeders": [],
+  "policies": ["CaseStudyPolicy"],
+
+  "permissions": [
+    "case_study.viewAny",
+    "case_study.view",
+    "case_study.create",
+    "case_study.update",
+    "case_study.delete",
+    "case_study.publish",
+    "case_study.unpublish",
+    "case_study.restore",
+    "case_study.duplicate",
+    "case_study.export"
+  ],
+
+  "public_routes": [
+    "GET /case-studies",
+    "GET /case-studies/{slug}",
+    "GET /portfolio/{slug}/case-studies"
+  ],
+
+  "api_routes": [
+    "GET    /api/v1/case-studies",
+    "POST   /api/v1/case-studies",
+    "GET    /api/v1/case-studies/{uuid}",
+    "PUT    /api/v1/case-studies/{uuid}",
+    "DELETE /api/v1/case-studies/{uuid}",
+    "POST   /api/v1/case-studies/{uuid}/publish",
+    "POST   /api/v1/case-studies/{uuid}/unpublish",
+    "POST   /api/v1/case-studies/{uuid}/duplicate",
+    "POST   /api/v1/case-studies/{uuid}/restore",
+    "POST   /api/v1/case-studies/{uuid}/preview",
+    "POST   /api/v1/case-studies/{uuid}/heartbeat",
+    "GET    /api/v1/case-studies/{uuid}/revisions",
+    "GET    /api/v1/case-studies/{uuid}/revisions/diff",
+    "GET    /api/v1/case-studies/featured",
+    "GET    /api/v1/case-studies/by-portfolio/{uuid}"
+  ],
+
+  "search": {
+    "enabled": true,
+    "provider": "content",
+    "type": "case_study",
+    "visibility": "public",
+    "boost": 30,
+    "index_version": 1,
+    "schema_version": 1
+  }
+}

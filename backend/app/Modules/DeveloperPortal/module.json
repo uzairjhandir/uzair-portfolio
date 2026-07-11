@@ -1,0 +1,35 @@
+{
+  "name": "API Documentation & Developer Portal",
+  "version": "1.0",
+  "namespace": "App\\Modules\\DeveloperPortal",
+  "provider": "App\\Modules\\DeveloperPortal\\DeveloperPortalServiceProvider",
+  "description": "Auto-generated OpenAPI 3.1 specs, SDK generator commands, and Webhook/Error/Event catalogs.",
+
+  "sub_modules": [
+    "Catalogs",
+    "Console",
+    "Controllers",
+    "Health",
+    "Widgets"
+  ],
+
+  "routes": [
+    "GET /api/docs/{version}/openapi.json",
+    "GET /api/docs/{version}/swagger",
+    "GET /api/docs/{version}/redoc",
+    "GET /api/docs/{version}/postman"
+  ],
+
+  "dashboard_widgets": [
+    "DeveloperPortalWidget"
+  ],
+
+  "health_checks": [
+    "DeveloperPortalHealthCheck"
+  ],
+
+  "commands": [
+    "api:generate-spec",
+    "api:generate-sdk"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Enterprise Dashboard",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Dashboard",
+  "provider": "App\\Modules\\Dashboard\\DashboardServiceProvider",
+  "description": "Executive dashboard aggregation. Consumes data from all other modules via the tagged widget system and Core Health Engine. Contains zero business logic.",
+
+  "sub_modules": [
+    "Widgets"
+  ],
+
+  "widgets": [
+    "KpiWidget",
+    "SystemHealthWidget",
+    "SearchHealthWidget",
+    "SeoHealthWidget",
+    "QueueMonitorWidget",
+    "ActivityFeedWidget",
+    "StorageWidget",
+    "ModuleStatusWidget"
+  ],
+
+  "routes": [
+    "GET /api/v1/admin/dashboard",
+    "GET /api/v1/admin/dashboard/{widget}"
+  ],
+
+  "tables": [
+    "system_health_snapshots"
+  ],
+
+  "permissions": [
+    "dashboard.view",
+    "system.monitor",
+    "search.admin",
+    "seo.admin"
+  ],
+
+  "future_extensions": [
+    "AnalyticsWidget (Module 20)",
+    "NotificationsWidget (Module 21)",
+    "SchedulerWidget (Module 22)"
+  ]
+}

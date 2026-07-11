@@ -1,0 +1,51 @@
+{
+  "name": "Enterprise Notifications Engine",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Notifications",
+  "provider": "App\\Modules\\Notifications\\NotificationsServiceProvider",
+  "description": "Centralized, reliable, multi-channel communication engine with queues, retries, and markdown templates.",
+
+  "sub_modules": [
+    "Drivers",
+    "Contracts",
+    "Enums",
+    "Jobs",
+    "Listeners",
+    "Models",
+    "Health",
+    "Widgets"
+  ],
+
+  "channels": [
+    "mail",
+    "slack",
+    "webhook",
+    "null"
+  ],
+
+  "routes": [
+    "GET /api/v1/n/open/{uuid}",
+    "GET /api/v1/n/click/{uuid}"
+  ],
+
+  "tables": [
+    "notification_layouts",
+    "notification_templates",
+    "notification_template_versions",
+    "notification_preferences",
+    "notification_rules",
+    "notification_logs"
+  ],
+
+  "queues": [
+    "notifications"
+  ],
+
+  "dashboard_widgets": [
+    "NotificationsWidget"
+  ],
+
+  "events_listened": [
+    "LeadCreated"
+  ]
+}

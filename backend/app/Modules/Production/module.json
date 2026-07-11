@@ -1,0 +1,38 @@
+{
+  "name": "Production Hardening",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Production",
+  "provider": "App\\Modules\\Production\\ProductionServiceProvider",
+  "description": "Enterprise security, deployment orchestration, health probes, and performance profiling.",
+
+  "sub_modules": [
+    "Console",
+    "Health",
+    "Http"
+  ],
+
+  "routes": [
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /health/startup",
+    "GET /health/details"
+  ],
+
+  "middleware": [
+    "SecurityHeaders",
+    "RequestProfilerMiddleware",
+    "EnhancedMaintenanceMode"
+  ],
+
+  "commands": [
+    "production:doctor",
+    "production:audit",
+    "production:warm",
+    "production:deploy"
+  ],
+
+  "health_checks": [
+    "QueueHealth",
+    "BackupHealth"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Enterprise Analytics Engine",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Analytics",
+  "provider": "App\\Modules\\Analytics\\AnalyticsServiceProvider",
+  "description": "Unified analytics abstraction layer with background queuing, Context Builder, and multi-driver support.",
+
+  "sub_modules": [
+    "Drivers",
+    "Jobs",
+    "Health"
+  ],
+
+  "drivers": [
+    "GoogleAnalyticsDriver",
+    "PlausibleDriver",
+    "UmamiDriver",
+    "MatomoDriver",
+    "ClarityDriver",
+    "NullDriver"
+  ],
+
+  "routes": [
+    "GET /api/v1/analytics/config",
+    "POST /api/v1/analytics/event"
+  ],
+
+  "tables": [
+    "feature_flags",
+    "experiments",
+    "experiment_variants",
+    "analytics_events_log"
+  ],
+
+  "queues": [
+    "analytics"
+  ],
+
+  "events_listened": [
+    "ContentPublished",
+    "DownloadCompleted",
+    "SearchExecuted"
+  ]
+}

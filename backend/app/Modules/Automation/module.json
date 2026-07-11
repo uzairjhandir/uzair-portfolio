@@ -1,0 +1,43 @@
+{
+  "name": "Enterprise Scheduler & Automation Engine",
+  "version": "1.0",
+  "namespace": "App\\Modules\\Automation",
+  "provider": "App\\Modules\\Automation\\AutomationServiceProvider",
+  "description": "Graph-based workflow orchestration engine allowing complex triggers, conditions, and actions asynchronously.",
+
+  "sub_modules": [
+    "Actions",
+    "Console",
+    "Contracts",
+    "Enums",
+    "Health",
+    "Jobs",
+    "Listeners",
+    "Models",
+    "Widgets"
+  ],
+
+  "actions": [
+    "wait",
+    "condition",
+    "notification",
+    "webhook",
+    "ai_action"
+  ],
+
+  "tables": [
+    "automation_workflows",
+    "automation_workflow_versions",
+    "automation_runs",
+    "automation_action_results",
+    "automation_logs"
+  ],
+
+  "queues": [
+    "automation"
+  ],
+
+  "dashboard_widgets": [
+    "AutomationWidget"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "CRM",
+  "version": "1.0",
+  "description": "Contact & CRM — lead management, contact form submissions, activity notes.",
+  "namespace": "App\\Modules\\Crm",
+
+  "dependencies": {
+    "core": [],
+    "modules": []
+  },
+
+  "note": "CRM does NOT extend AbstractContentController. Contacts are not content items. CRM is a relationship management domain with its own authorization and data model.",
+
+  "routes": true,
+  "migrations": true,
+  "seeders": [],
+  "policies": ["ContactPolicy"],
+
+  "permissions": [
+    "crm.viewAny",
+    "crm.view",
+    "crm.create",
+    "crm.update",
+    "crm.delete",
+    "crm.export"
+  ],
+
+  "public_routes": [
+    "POST /api/v1/contact"
+  ],
+
+  "api_routes": [
+    "GET    /api/v1/crm/contacts",
+    "POST   /api/v1/crm/contacts",
+    "GET    /api/v1/crm/contacts/{uuid}",
+    "PUT    /api/v1/crm/contacts/{uuid}",
+    "DELETE /api/v1/crm/contacts/{uuid}",
+    "GET    /api/v1/crm/contacts/{uuid}/notes",
+    "POST   /api/v1/crm/contacts/{uuid}/notes"
+  ]
+}

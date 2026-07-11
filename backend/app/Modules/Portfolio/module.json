@@ -1,0 +1,71 @@
+{
+  "name": "Portfolio",
+  "version": "1.0",
+  "description": "Portfolio engine — projects, clients, technologies, open source, featured work.",
+  "namespace": "App\\Modules\\Portfolio",
+
+  "dependencies": {
+    "core": [
+      "Core.Content",
+      "Core.Taxonomy",
+      "Core.Media",
+      "Core.SEO",
+      "Core.Metrics"
+    ],
+    "modules": []
+  },
+
+  "routes": true,
+  "migrations": true,
+  "seeders": [],
+  "policies": ["PortfolioPolicy"],
+
+  "permissions": [
+    "portfolio.viewAny",
+    "portfolio.view",
+    "portfolio.create",
+    "portfolio.update",
+    "portfolio.delete",
+    "portfolio.publish",
+    "portfolio.unpublish",
+    "portfolio.restore",
+    "portfolio.duplicate",
+    "portfolio.export"
+  ],
+
+  "public_routes": [
+    "GET /portfolio",
+    "GET /portfolio/{slug}",
+    "GET /portfolio/technology/{slug}",
+    "GET /portfolio/client/{slug}"
+  ],
+
+  "api_routes": [
+    "GET    /api/v1/portfolios",
+    "POST   /api/v1/portfolios",
+    "GET    /api/v1/portfolios/{uuid}",
+    "PUT    /api/v1/portfolios/{uuid}",
+    "DELETE /api/v1/portfolios/{uuid}",
+    "POST   /api/v1/portfolios/{uuid}/publish",
+    "POST   /api/v1/portfolios/{uuid}/unpublish",
+    "POST   /api/v1/portfolios/{uuid}/duplicate",
+    "POST   /api/v1/portfolios/{uuid}/restore",
+    "POST   /api/v1/portfolios/{uuid}/preview",
+    "POST   /api/v1/portfolios/{uuid}/heartbeat",
+    "GET    /api/v1/portfolios/{uuid}/revisions",
+    "GET    /api/v1/portfolios/{uuid}/revisions/diff",
+    "GET    /api/v1/portfolios/featured",
+    "GET    /api/v1/portfolios/open-source",
+    "POST   /api/v1/portfolios/{uuid}/view"
+  ],
+
+  "search": {
+    "enabled": true,
+    "provider": "content",
+    "type": "portfolio",
+    "visibility": "public",
+    "boost": 35,
+    "index_version": 1,
+    "schema_version": 1
+  }
+}

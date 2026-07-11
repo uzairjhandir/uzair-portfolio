@@ -1,0 +1,82 @@
+{
+  "name": "Blog",
+  "version": "1.0",
+  "description": "Blog engine — articles, series, reading time, featured and pinned posts.",
+  "namespace": "App\\Modules\\Blog",
+
+  "dependencies": {
+    "core": [
+      "Core.Content",
+      "Core.Taxonomy",
+      "Core.Media",
+      "Core.SEO",
+      "Core.Metrics",
+      "Core.Feeds"
+    ],
+    "modules": []
+  },
+
+  "routes": true,
+  "migrations": true,
+  "seeders": ["BlogTaxonomySeeder"],
+  "policies": ["BlogPolicy"],
+
+  "feed_providers": ["BlogFeedProvider"],
+
+  "permissions": [
+    "blog.viewAny",
+    "blog.view",
+    "blog.create",
+    "blog.update",
+    "blog.delete",
+    "blog.publish",
+    "blog.unpublish",
+    "blog.restore",
+    "blog.duplicate",
+    "blog.export",
+    "blog.import",
+    "blog.pin",
+    "blog.feature"
+  ],
+
+  "public_routes": [
+    "GET /blog",
+    "GET /blog/{slug}",
+    "GET /blog/category/{slug}",
+    "GET /blog/tag/{slug}",
+    "GET /blog/series/{slug}"
+  ],
+
+  "api_routes": [
+    "GET    /api/v1/blogs",
+    "POST   /api/v1/blogs",
+    "GET    /api/v1/blogs/{uuid}",
+    "PUT    /api/v1/blogs/{uuid}",
+    "DELETE /api/v1/blogs/{uuid}",
+    "POST   /api/v1/blogs/{uuid}/publish",
+    "POST   /api/v1/blogs/{uuid}/unpublish",
+    "POST   /api/v1/blogs/{uuid}/duplicate",
+    "POST   /api/v1/blogs/{uuid}/restore",
+    "POST   /api/v1/blogs/{uuid}/preview",
+    "POST   /api/v1/blogs/{uuid}/heartbeat",
+    "GET    /api/v1/blogs/{uuid}/revisions",
+    "GET    /api/v1/blogs/{uuid}/revisions/{version}",
+    "GET    /api/v1/blogs/{uuid}/revisions/diff",
+    "GET    /api/v1/blogs/featured",
+    "GET    /api/v1/blogs/pinned",
+    "GET    /api/v1/blogs/{uuid}/related",
+    "GET    /api/v1/feed/blog.xml",
+    "GET    /api/v1/feed/blog.atom",
+    "GET    /api/v1/feed/blog.json"
+  ],
+
+  "search": {
+    "enabled": true,
+    "provider": "content",
+    "type": "blog",
+    "visibility": "public",
+    "boost": 40,
+    "index_version": 1,
+    "schema_version": 1
+  }
+}
