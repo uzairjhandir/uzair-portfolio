@@ -235,6 +235,24 @@ Route::prefix('v1')->group(function () {
         Route::get('click/{uuid}', [\App\Modules\Notifications\NotificationController::class, 'trackClick']);
     });
 
+    // ── Module 21b: Notifications Admin (auth required) ───────────────────────
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+        Route::get('admin/notifications', [\App\Modules\Notifications\NotificationController::class, 'index']);
+    });
+
+    // ── Module 22: Automation (auth required) ─────────────────────────────────
+    Route::middleware(['auth:sanctum', 'verified'])->prefix('automation')->group(function () {
+        Route::get('workflows',                          [\App\Modules\Automation\AutomationController::class, 'index']);
+        Route::post('workflows',                         [\App\Modules\Automation\AutomationController::class, 'store']);
+        Route::get('workflows/{uuid}',                    [\App\Modules\Automation\AutomationController::class, 'show']);
+        Route::put('workflows/{uuid}',                    [\App\Modules\Automation\AutomationController::class, 'update']);
+        Route::delete('workflows/{uuid}',                 [\App\Modules\Automation\AutomationController::class, 'destroy']);
+        Route::get('workflows/{uuid}/versions',            [\App\Modules\Automation\AutomationController::class, 'versions']);
+        Route::post('workflows/{uuid}/versions',           [\App\Modules\Automation\AutomationController::class, 'publishVersion']);
+        Route::get('workflows/{uuid}/runs',                [\App\Modules\Automation\AutomationController::class, 'runs']);
+        Route::get('runs/{id}',                            [\App\Modules\Automation\AutomationController::class, 'showRun']);
+    });
+
     // ── Module 23: Developer Portal ───────────────────────────────────────────
     Route::prefix('docs')->group(function () {
         Route::get('{version}/openapi.json', [\App\Modules\DeveloperPortal\Controllers\ApiDocsController::class, 'spec']);

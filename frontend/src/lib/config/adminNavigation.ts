@@ -1,13 +1,16 @@
-import { 
-  Home, 
-  LayoutDashboard, 
-  Briefcase, 
-  FileText, 
-  Users, 
-  Settings, 
+import {
+  Home,
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  Users,
+  Settings,
   Image as ImageIcon,
   Mail,
-  UserCircle
+  UserCircle,
+  Send,
+  Workflow,
+  Bell
 } from "lucide-react";
 import * as React from "react";
 
@@ -39,64 +42,9 @@ export const adminNavigation: NavItem[] = [
     permission: "homepage.view",
     children: [
       {
-        title: "Hero Section",
-        href: "/admin/homepage/hero",
-        permission: "homepage.hero.view",
-      },
-      {
-        title: "About",
-        href: "/admin/homepage/about",
-        permission: "homepage.about.view",
-      },
-      {
-        title: "Services",
-        href: "/admin/homepage/services",
-        permission: "homepage.services.view",
-      },
-      {
-        title: "Skills",
-        href: "/admin/homepage/skills",
-        permission: "homepage.skills.view",
-      },
-      {
-        title: "Experience",
-        href: "/admin/homepage/experience",
-        permission: "homepage.experience.view",
-      },
-      {
-        title: "Technologies",
-        href: "/admin/homepage/technologies",
-        permission: "homepage.technologies.view",
-      },
-      {
-        title: "Process",
-        href: "/admin/homepage/process",
-        permission: "homepage.process.view",
-      },
-      {
-        title: "Client Logos",
-        href: "/admin/homepage/client-logos",
-        permission: "homepage.client-logos.view",
-      },
-      {
-        title: "Testimonials",
-        href: "/admin/homepage/testimonials",
-        permission: "homepage.testimonials.view",
-      },
-      {
-        title: "FAQ",
-        href: "/admin/homepage/faq",
-        permission: "homepage.faq.view",
-      },
-      {
-        title: "Contact Section",
-        href: "/admin/homepage/contact",
-        permission: "homepage.contact.view",
-      },
-      {
-        title: "SEO",
-        href: "/admin/homepage/seo",
-        permission: "homepage.seo.view",
+        title: "Homepage Builder",
+        href: "/admin/homepage-builder",
+        permission: "homepage.view",
       },
       {
         title: "Settings",
@@ -124,6 +72,21 @@ export const adminNavigation: NavItem[] = [
     title: "CRM / Leads",
     icon: Mail,
     href: "/admin/crm",
+  },
+  {
+    title: "Newsletter",
+    icon: Send,
+    href: "/admin/newsletter",
+  },
+  {
+    title: "Automation",
+    icon: Workflow,
+    href: "/admin/automation",
+  },
+  {
+    title: "Notifications",
+    icon: Bell,
+    href: "/admin/notifications",
   },
   {
     title: "Users",

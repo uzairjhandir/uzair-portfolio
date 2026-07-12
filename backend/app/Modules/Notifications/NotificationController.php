@@ -10,6 +10,27 @@ use Illuminate\Http\Response;
 class NotificationController
 {
     /**
+     * GET /api/v1/admin/notifications
+     * Minimal read-only delivery log viewer. No compose/send action exists —
+     * this module is driven entirely by internal NotificationManager::send()
+     * calls from other modules.
+     */
+    public function index(Request $request)
+    {
+        $logs = NotificationLog::query()
+            ->when($request->query('status'), fn($q, $s) => $q->where('status', $s))
+            ->when($request->query('channel'), fn($q, $c) => $q->where('channel', $c))
+            ->when($request->query('search'), fn($q, $s) =>
+                $q->where(fn($q2) => $q2->where('recipient_contact', 'like', "%{$s}%")
+                                        ->orWhere('template_key', 'like', "%{$s}%"))
+            )
+            ->orderByDesc('created_at')
+            ->paginate((int) $request->query('per_page', 25));
+
+        return response()->json($logs);
+    }
+
+    /**
      * GET /api/v1/n/open/{uuid}
      * Returns a 1x1 transparent tracking pixel.
      */
