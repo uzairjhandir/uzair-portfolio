@@ -3,11 +3,19 @@ import {
   LayoutDashboard,
   Briefcase,
   FileText,
+  Files,
+  Compass,
+  BookOpen,
+  Download,
   Users,
+  Shield,
   Settings,
   Image as ImageIcon,
   Mail,
-  UserCircle,
+  MessageSquare,
+  ArrowRightLeft,
+  Activity,
+  HeartPulse,
   Send,
   Workflow,
   Bell
@@ -51,7 +59,21 @@ export const adminNavigation: NavItem[] = [
         href: "/admin/homepage/settings",
         permission: "homepage.settings.view",
       },
+      {
+        title: "Footer",
+        href: "/admin/footer",
+      },
     ]
+  },
+  {
+    title: "Pages",
+    icon: Files,
+    href: "/admin/pages",
+  },
+  {
+    title: "Navigation",
+    icon: Compass,
+    href: "/admin/navigation",
   },
   {
     title: "Portfolio",
@@ -59,9 +81,19 @@ export const adminNavigation: NavItem[] = [
     href: "/admin/portfolio",
   },
   {
+    title: "Case Studies",
+    icon: BookOpen,
+    href: "/admin/case-studies",
+  },
+  {
     title: "Blog",
     icon: FileText,
     href: "/admin/blog",
+  },
+  {
+    title: "Downloads",
+    icon: Download,
+    href: "/admin/downloads",
   },
   {
     title: "Media Library",
@@ -72,6 +104,11 @@ export const adminNavigation: NavItem[] = [
     title: "CRM / Leads",
     icon: Mail,
     href: "/admin/crm",
+  },
+  {
+    title: "Contact Submissions",
+    icon: MessageSquare,
+    href: "/admin/contact",
   },
   {
     title: "Newsletter",
@@ -89,14 +126,29 @@ export const adminNavigation: NavItem[] = [
     href: "/admin/notifications",
   },
   {
+    title: "Redirects",
+    icon: ArrowRightLeft,
+    href: "/admin/redirects",
+  },
+  {
     title: "Users",
     icon: Users,
     href: "/admin/users",
   },
   {
-    title: "Profile",
-    icon: UserCircle,
-    href: "/admin/profile",
+    title: "Roles",
+    icon: Shield,
+    href: "/admin/roles",
+  },
+  {
+    title: "Activity Logs",
+    icon: Activity,
+    href: "/admin/activity-logs",
+  },
+  {
+    title: "System Health",
+    icon: HeartPulse,
+    href: "/admin/system-health",
   },
   {
     title: "Settings",
