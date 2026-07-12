@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-use App\Core\Content\Concerns\HasContentSeo;
-use App\Core\Content\Concerns\HasContentPublishing;
-use App\Core\Content\Concerns\HasContentScheduling;
-use App\Core\Content\Concerns\HasContentSlug;
-use App\Core\Content\Concerns\HasContentRevisions;
-use App\Core\Content\Concerns\HasContentMedia;
-use App\Core\Content\Concerns\HasContentSearch;
+use App\Models\Concerns\HasContentSeo;
+use App\Models\Concerns\HasContentPublishing;
+use App\Models\Concerns\HasContentScheduling;
+use App\Models\Concerns\HasContentSlug;
+use App\Models\Concerns\HasContentRevisions;
+use App\Models\Concerns\HasContentMedia;
+use App\Models\Concerns\HasContentSearch;
 use App\Core\Content\Concerns\HasContentLocking;
 use App\Core\Content\Concerns\HasContentMetrics;
 use App\Core\Content\Concerns\HasTaxonomy;
@@ -21,6 +21,11 @@ use App\Models\Concerns\HasPreviewToken;
 class Portfolio extends Model
 {
     use HasUuids, SoftDeletes;
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
     // Core traits — exact same composition as Blog
     use HasContentSeo;

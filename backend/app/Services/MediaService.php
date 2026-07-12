@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\MediaRepositoryInterface;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MediaService
@@ -26,7 +27,7 @@ class MediaService
 
         // 3. Fallback logic since Spatie is not literally installed yet
         // In reality, this would use $model->addMedia($file)->toMediaCollection()
-        
+
         $media = Media::create([
             'folder_id' => $folderId,
             'collection_name' => 'default',
@@ -45,19 +46,26 @@ class MediaService
             'responsive_images' => [],
         ]);
 
+        // Persist the file to storage/app/public/{id}/{file_name}, matching
+        // the path MediaResource::getUrl() already assumes.
+        $file->storeAs((string) $media->id, $file->getClientOriginalName(), 'public');
+
         return $media;
     }
 
     public function replaceMedia(Media $media, UploadedFile $newFile): Media
     {
-        // Update physical file but keep Media ID
+        // Remove the old file(s) for this media ID, then store the new one.
+        Storage::disk('public')->deleteDirectory((string) $media->id);
+        $newFile->storeAs((string) $media->id, $newFile->getClientOriginalName(), 'public');
+
         $media->update([
             'file_name' => $newFile->getClientOriginalName(),
             'mime_type' => $newFile->getMimeType(),
             'size' => $newFile->getSize(),
             'checksum' => hash_file('sha256', $newFile->getRealPath()),
         ]);
-        
+
         return $media;
     }
 }

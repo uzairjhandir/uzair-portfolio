@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 // Core Content Engine traits — composed, not inherited
-use App\Core\Content\Concerns\HasContentSeo;
-use App\Core\Content\Concerns\HasContentPublishing;
-use App\Core\Content\Concerns\HasContentScheduling;
-use App\Core\Content\Concerns\HasContentSlug;
-use App\Core\Content\Concerns\HasContentRevisions;
-use App\Core\Content\Concerns\HasContentMedia;
-use App\Core\Content\Concerns\HasContentSearch;
+use App\Models\Concerns\HasContentSeo;
+use App\Models\Concerns\HasContentPublishing;
+use App\Models\Concerns\HasContentScheduling;
+use App\Models\Concerns\HasContentSlug;
+use App\Models\Concerns\HasContentRevisions;
+use App\Models\Concerns\HasContentMedia;
+use App\Models\Concerns\HasContentSearch;
 use App\Core\Content\Concerns\HasContentLocking;
 use App\Core\Content\Concerns\HasTaxonomy;
 use App\Models\Concerns\HasPreviewToken;
@@ -35,6 +35,11 @@ class Blog extends Model implements SearchableResource
     use HasTaxonomy;
     use HasPreviewToken;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'blogs';
 
     protected $fillable = [
@@ -47,6 +52,7 @@ class Blog extends Model implements SearchableResource
         'created_by', 'updated_by',
         // Blog-specific
         'blog_series_id', 'reading_time', 'is_featured', 'is_pinned',
+        'featured_image_id',
     ];
 
     protected $casts = [
@@ -72,6 +78,11 @@ class Blog extends Model implements SearchableResource
     public function author()
     {
         return $this->belongsTo(\App\Models\User::class, 'author_id');
+    }
+
+    public function featuredImage()
+    {
+        return $this->belongsTo(\App\Models\Media::class, 'featured_image_id');
     }
 
     public function relatedPosts()
@@ -113,5 +124,50 @@ class Blog extends Model implements SearchableResource
             $wordCount = str_word_count(strip_tags($this->content));
             $this->update(['reading_time' => (int) ceil($wordCount / 200)]);
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // SearchableResource
+    // -------------------------------------------------------------------------
+
+    public function toSearchDocument(): array
+    {
+        return [
+            'uuid'            => $this->uuid,
+            'searchable_uuid' => $this->uuid,
+            'module'          => 'Blog',
+            'locale'          => 'en',
+            'title'           => $this->title,
+            'summary'         => $this->excerpt,
+            'content'         => $this->content,
+            'keywords'        => null,
+            'url'             => "/blog/{$this->slug}",
+            'image'           => $this->featuredImage?->original_url,
+            'status'          => $this->status,
+            'visibility'      => 'public',
+            'published_at'    => $this->publish_at,
+            'metadata'        => [
+                'reading_time' => $this->reading_time,
+                'view_count'   => $this->view_count,
+            ],
+        ];
+    }
+
+    public function getSearchType(): string
+    {
+        return 'blog';
+    }
+
+    public function isSearchable(): bool
+    {
+        return $this->status === 'published' && $this->is_searchable;
+    }
+
+    public function getSearchBoost(): int
+    {
+        $boost = 10;
+        if ($this->is_featured) $boost += 10;
+        if ($this->is_pinned) $boost += 5;
+        return $boost;
     }
 }

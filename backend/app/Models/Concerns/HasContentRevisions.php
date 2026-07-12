@@ -30,6 +30,7 @@ trait HasContentRevisions
             'comment' => $comment,
             'snapshot' => $this->toArray(),
             'created_by' => auth()->id(),
+            'created_at' => now(),
         ]);
     }
 

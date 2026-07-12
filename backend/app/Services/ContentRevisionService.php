@@ -56,3 +56,4 @@ class ContentRevisionService
 
         return compact('added', 'removed', 'modified');
     }
+}

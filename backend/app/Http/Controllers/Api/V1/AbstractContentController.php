@@ -44,8 +44,10 @@ abstract class AbstractContentController extends Controller
 
     public function store(Request $request)
     {
-        // Extend in child controller for specific validation
-        $item = $this->modelClass::create($request->validated());
+        // Extend in child controller for specific validation. Falls back to the
+        // model's own $fillable as the mass-assignment boundary when no child
+        // controller provides a FormRequest.
+        $item = $this->modelClass::create($request->all());
         event(new \App\Events\ContentCreated($item));
         return new $this->resourceClass($item);
     }
@@ -53,7 +55,7 @@ abstract class AbstractContentController extends Controller
     public function update(Request $request, string $uuid)
     {
         $item = $this->modelClass::where('uuid', $uuid)->firstOrFail();
-        $item->update($request->validated());
+        $item->update($request->all());
         event(new \App\Events\ContentUpdated($item));
         return new $this->resourceClass($item);
     }
