@@ -28,6 +28,7 @@ class SearchServiceProvider extends ServiceProvider
 
         $events = $this->app['events'];
 
+        $events->listen(\App\Events\ContentCreated::class,   [Listeners\SearchIndexListener::class, 'handleCreated']);
         $events->listen(\App\Events\ContentPublished::class, [Listeners\SearchIndexListener::class, 'handlePublished']);
         $events->listen(\App\Events\ContentUpdated::class,   [Listeners\SearchIndexListener::class, 'handleUpdated']);
         $events->listen(\App\Events\ContentDeleted::class,   [Listeners\SearchIndexListener::class, 'handleDeleted']);

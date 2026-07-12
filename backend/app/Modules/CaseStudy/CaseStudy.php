@@ -18,8 +18,9 @@ use App\Core\Content\Concerns\HasContentMetrics;
 use App\Core\Content\Concerns\HasContentRelations;
 use App\Core\Content\Concerns\HasTaxonomy;
 use App\Models\Concerns\HasPreviewToken;
+use App\Modules\Search\Contracts\SearchableResource;
 
-class CaseStudy extends Model
+class CaseStudy extends Model implements SearchableResource
 {
     use HasUuids, SoftDeletes;
 
@@ -91,5 +92,46 @@ class CaseStudy extends Model
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true)->where('status', 'published');
+    }
+
+    // -------------------------------------------------------------------------
+    // SearchableResource
+    // -------------------------------------------------------------------------
+
+    public function toSearchDocument(): array
+    {
+        return [
+            'uuid'            => $this->uuid,
+            'searchable_uuid' => $this->uuid,
+            'module'          => 'CaseStudy',
+            'locale'          => 'en',
+            'title'           => $this->title,
+            'summary'         => $this->excerpt,
+            'content'         => trim(implode("\n", array_filter([$this->challenge, $this->solution, $this->implementation, $this->results]))),
+            'keywords'        => null,
+            'url'             => "/case-studies/{$this->slug}",
+            'image'           => $this->featuredImage?->first()?->original_url,
+            'status'          => $this->status,
+            'visibility'      => 'public',
+            'published_at'    => $this->publish_at,
+            'metadata'        => [
+                'portfolio_uuid' => $this->portfolio?->uuid,
+            ],
+        ];
+    }
+
+    public function getSearchType(): string
+    {
+        return 'case_study';
+    }
+
+    public function isSearchable(): bool
+    {
+        return $this->status === 'published' && $this->is_searchable;
+    }
+
+    public function getSearchBoost(): int
+    {
+        return $this->is_featured ? 15 : 8;
     }
 }

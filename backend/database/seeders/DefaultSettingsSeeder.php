@@ -26,7 +26,7 @@ class DefaultSettingsSeeder extends Seeder
             'Maintenance' => ['icon' => 'lucide-tool', 'sort_order' => 12],
             'Cache' => ['icon' => 'lucide-database', 'sort_order' => 13],
             'Backup' => ['icon' => 'lucide-hard-drive', 'sort_order' => 14],
-            'API' => ['icon' => 'lucide-code', 'sort_order' => 15],
+            'API Keys' => ['icon' => 'lucide-code', 'sort_order' => 15, 'slug' => 'api'],
             // Slug forced to 'livechat' (not the auto-slugified 'live-chat') because
             // SettingService::get() derives the cache/lookup group from the setting
             // key's first dot-segment, and every LiveChat driver reads keys prefixed
@@ -105,6 +105,17 @@ class DefaultSettingsSeeder extends Seeder
                     ['key' => 'livechat.crisp.website_id', 'default_value' => '', 'type' => 'string'],
                     ['key' => 'livechat.position', 'default_value' => 'bottom-right', 'type' => 'string'],
                     ['key' => 'livechat.mobile_enabled', 'default_value' => true, 'type' => 'boolean'],
+                ];
+                break;
+            case 'api':
+                $settings = [
+                    ['key' => 'api.openai_key', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'api.gemini_key', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'api.claude_key', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'api.google_maps_key', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'api.cloudflare_token', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'api.recaptcha_site_key', 'default_value' => '', 'type' => 'string', 'is_public' => true],
+                    ['key' => 'api.recaptcha_secret_key', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
                 ];
                 break;
             // Additional categories can be seeded here...

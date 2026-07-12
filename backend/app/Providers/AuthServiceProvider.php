@@ -17,6 +17,13 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\User::class => \App\Policies\UserPolicy::class,
         \App\Models\Role::class => \App\Policies\RolePolicy::class,
         \App\Models\Permission::class => \App\Policies\PermissionPolicy::class,
+        // DownloadPolicy lives alongside its model (App\Modules\Downloads),
+        // not under App\Policies, so Laravel's naming-convention auto-discovery
+        // never finds it — DownloadController::serve()'s authorize('download', ...)
+        // had no policy to resolve against and denied every request, including
+        // anonymous access to 'public' access_level downloads the policy
+        // explicitly supports.
+        \App\Modules\Downloads\Download::class => \App\Modules\Downloads\DownloadPolicy::class,
     ];
 
     /**
@@ -29,9 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         // Implicitly grant "Super Admin" role all permissions
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
         Gate::before(function ($user, $ability) {
-            // Uncomment when Spatie is installed
-            // return $user->hasRole(RoleEnum::SUPER_ADMIN->value) ? true : null;
-            return null;
+            return $user->hasRole('Super Admin') ? true : null;
         });
     }
 }

@@ -17,8 +17,9 @@ use App\Core\Content\Concerns\HasContentLocking;
 use App\Core\Content\Concerns\HasContentMetrics;
 use App\Core\Content\Concerns\HasTaxonomy;
 use App\Models\Concerns\HasPreviewToken;
+use App\Modules\Search\Contracts\SearchableResource;
 
-class Portfolio extends Model
+class Portfolio extends Model implements SearchableResource
 {
     use HasUuids, SoftDeletes;
 
@@ -101,5 +102,46 @@ class Portfolio extends Model
     public function scopeOpenSource($query)
     {
         return $query->where('is_open_source', true)->where('status', 'published');
+    }
+
+    // -------------------------------------------------------------------------
+    // SearchableResource
+    // -------------------------------------------------------------------------
+
+    public function toSearchDocument(): array
+    {
+        return [
+            'uuid'            => $this->uuid,
+            'searchable_uuid' => $this->uuid,
+            'module'          => 'Portfolio',
+            'locale'          => 'en',
+            'title'           => $this->title,
+            'summary'         => $this->excerpt,
+            'content'         => $this->content,
+            'keywords'        => null,
+            'url'             => "/portfolio/{$this->slug}",
+            'image'           => $this->featuredImage?->first()?->original_url,
+            'status'          => $this->status,
+            'visibility'      => 'public',
+            'published_at'    => $this->publish_at,
+            'metadata'        => [
+                'client_name' => $this->client_name,
+            ],
+        ];
+    }
+
+    public function getSearchType(): string
+    {
+        return 'portfolio';
+    }
+
+    public function isSearchable(): bool
+    {
+        return $this->status === 'published' && $this->is_searchable;
+    }
+
+    public function getSearchBoost(): int
+    {
+        return $this->is_featured ? 15 : 8;
     }
 }

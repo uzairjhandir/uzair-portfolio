@@ -33,7 +33,7 @@ class PageService
     {
         // 1. Snapshot current state before updating
         $latestRevision = $page->revisions()->first();
-        $nextVersion = this->calculateNextVersion($latestRevision?->version ?? 'v1.0');
+        $nextVersion = $this->calculateNextVersion($latestRevision?->version ?? 'v1.0');
         
         $this->createRevision($page, $nextVersion, $data['change_summary'] ?? 'Update', $userId);
 
