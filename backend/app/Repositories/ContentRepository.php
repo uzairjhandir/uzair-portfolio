@@ -74,7 +74,7 @@ class ContentRepository
         // Copy media collections unless mode is 'without_media'
         if ($mode !== 'without_media' && method_exists($content, 'mediaCollection')) {
             foreach (['featured', 'gallery', 'attachments'] as $collection) {
-                $mediaIds = $content->mediaCollection($collection)->pluck('id');
+                $mediaIds = $content->mediaCollection($collection)->pluck('media.id');
                 if ($mediaIds->isNotEmpty()) {
                     $pivotData = $mediaIds->mapWithKeys(fn($id, $i) => [$id => ['collection' => $collection, 'sort_order' => $i]]);
                     $clone->morphToMany(\App\Models\Media::class, 'mediable', 'content_media')->attach($pivotData);

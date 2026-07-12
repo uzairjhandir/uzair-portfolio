@@ -2,6 +2,7 @@ import * as React from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
+  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -40,6 +41,11 @@ interface DataTableProps<TData, TValue> {
   onEdit?: (row: TData) => void
   onDelete?: (row: TData) => void
   onClone?: (row: TData) => void
+  /** Server-driven pagination. When provided, DataTable stops slicing `data` itself and defers to these. */
+  manualPagination?: boolean
+  pageCount?: number
+  pagination?: PaginationState
+  onPaginationChange?: (updater: PaginationState | ((old: PaginationState) => PaginationState)) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -56,6 +62,10 @@ export function DataTable<TData, TValue>({
   onEdit,
   onDelete,
   onClone,
+  manualPagination = false,
+  pageCount,
+  pagination,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -71,12 +81,14 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      ...(pagination ? { pagination } : {}),
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    ...(manualPagination ? { manualPagination: true, pageCount: pageCount ?? -1, onPaginationChange } : {}),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

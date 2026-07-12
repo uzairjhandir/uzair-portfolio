@@ -1,25 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import { blogKeys } from './keys';
-import { BlogPost } from './types';
+import { BlogPost, BlogListResponse, BlogFilters } from './types';
 
-export const useBlogListQuery = (filters?: Record<string, any>) => {
+export const useBlogListQuery = (filters: BlogFilters = {}) => {
   return useQuery({
-    queryKey: blogKeys.list(filters || {}),
-    queryFn: async (): Promise<{ data: BlogPost[], meta: any }> => {
+    queryKey: blogKeys.list(filters),
+    queryFn: async (): Promise<BlogListResponse> => {
       const response = await apiClient.get('/blogs', { params: filters });
       return response.data;
     },
   });
 };
 
-export const useBlogDetailQuery = (slug: string) => {
+export const useBlogDetailQuery = (uuid: string) => {
   return useQuery({
-    queryKey: blogKeys.detail(slug),
+    queryKey: blogKeys.detail(uuid),
     queryFn: async (): Promise<BlogPost> => {
-      const response = await apiClient.get(`/blogs/${slug}`);
+      const response = await apiClient.get(`/blogs/${uuid}`);
       return response.data.data;
     },
-    enabled: !!slug,
+    enabled: !!uuid,
   });
 };

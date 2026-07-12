@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${siteUrl}/blog/${post.slug}`,
       images: [
         {
-          url: post.featured_image || 'https://placehold.co/1200x630',
+          url: post.featured_image?.original_url || 'https://placehold.co/1200x630',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt || post.title,
-      images: [post.featured_image || 'https://placehold.co/1200x630'],
+      images: [post.featured_image?.original_url || 'https://placehold.co/1200x630'],
     },
   };
 }
@@ -96,10 +96,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     "@type": "Article",
     "headline": post.title,
     "image": [
-      post.featured_image ? (post.featured_image.startsWith('http') ? post.featured_image : `${siteUrl}${post.featured_image}`) : 'https://placehold.co/1200x630'
+      post.featured_image?.original_url
+        ? (post.featured_image.original_url.startsWith('http') ? post.featured_image.original_url : `${siteUrl}${post.featured_image.original_url}`)
+        : 'https://placehold.co/1200x630'
     ],
-    "datePublished": new Date(post.published_at || post.created_at).toISOString(),
-    "dateModified": new Date(post.published_at || post.created_at).toISOString(),
+    "datePublished": new Date(post.publish_at || post.created_at).toISOString(),
+    "dateModified": new Date(post.publish_at || post.created_at).toISOString(),
     "author": [{
         "@type": "Person",
         "name": "Admin",
@@ -143,7 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="absolute inset-0 z-0">
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-30"
-            style={{ backgroundImage: `url(${post.featured_image || 'https://placehold.co/1920x1080'})` }}
+            style={{ backgroundImage: `url(${post.featured_image?.original_url || 'https://placehold.co/1920x1080'})` }}
           ></div>
           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1A]/80 via-[#0A0F1A]/95 to-[#0A0F1A]"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[200px] pointer-events-none"></div>
@@ -173,7 +175,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </div>
                 Admin
               </span>
-              <span className="flex items-center gap-2"><Calendar size={16} className="text-white/40" /> {new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+              <span className="flex items-center gap-2"><Calendar size={16} className="text-white/40" /> {new Date(post.publish_at || post.created_at).toLocaleDateString()}</span>
               <span className="flex items-center gap-2"><Clock size={16} className="text-white/40" /> 5 min read</span>
             </div>
           </FadeIn>
@@ -293,7 +295,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {relatedPosts.map((relatedPost) => (
                 <Link key={relatedPost.slug} href={`/blog/${relatedPost.slug}`} className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-300">
                   <div className="relative h-48 overflow-hidden">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${relatedPost.featured_image || 'https://placehold.co/600x400'})` }}></div>
+                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${relatedPost.featured_image?.original_url || 'https://placehold.co/600x400'})` }}></div>
                   </div>
                   <div className="p-6">
                     <span className="text-accent text-xs font-bold uppercase tracking-wider mb-2 block">Article</span>

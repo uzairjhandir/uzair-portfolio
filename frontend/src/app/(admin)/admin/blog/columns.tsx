@@ -1,21 +1,21 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { BlogRecord } from "./types";
+import { BlogPost } from "@/lib/query/blog/types";
 import { StatusBadge } from "@/components/admin/ui/StatusBadge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export const blogColumns: ColumnDef<BlogRecord>[] = [
+export const blogColumns: ColumnDef<BlogPost>[] = [
   {
     accessorKey: "featured_image",
     header: "Cover",
     cell: ({ row }) => (
       <div className="w-12 h-8 rounded overflow-hidden bg-muted">
-        {row.original.featured_image ? (
-          <img src={row.original.featured_image} alt="Cover" className="w-full h-full object-cover" />
+        {row.original.featured_image?.original_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={row.original.featured_image.original_url} alt="Cover" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full bg-primary/10" />
         )}
       </div>
-    )
+    ),
   },
   {
     accessorKey: "title",
@@ -25,32 +25,27 @@ export const blogColumns: ColumnDef<BlogRecord>[] = [
         <p className="font-medium">{row.original.title}</p>
         <p className="text-xs text-muted-foreground">{row.original.slug}</p>
       </div>
-    )
+    ),
   },
   {
-    accessorKey: "author_id",
+    accessorKey: "author",
     header: "Author",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Avatar className="w-6 h-6">
-          <AvatarFallback>{row.original.author_id.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <span className="text-sm">{row.original.author_id}</span>
-      </div>
-    )
+      <span className="text-sm">{row.original.author?.name || '—'}</span>
+    ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status as any} />
+    cell: ({ row }) => <StatusBadge status={row.original.status as any} />,
   },
   {
-    accessorKey: "published_at",
+    accessorKey: "publish_at",
     header: "Published",
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
-        {row.original.published_at ? new Date(row.original.published_at).toLocaleDateString() : "—"}
+        {row.original.publish_at ? new Date(row.original.publish_at).toLocaleDateString() : "—"}
       </span>
-    )
-  }
+    ),
+  },
 ];

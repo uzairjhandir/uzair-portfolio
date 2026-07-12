@@ -63,13 +63,13 @@ export function BlogListClient() {
             
             <Link href={`/blog/${featuredPost.slug}`} className="group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-[#0A0F1A]/80 border border-white/10 rounded-3xl overflow-hidden hover:border-accent/40 transition-all duration-500 shadow-2xl">
               <div className="relative h-80 lg:h-full overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" style={{ backgroundImage: `url(${featuredPost.featured_image || 'https://placehold.co/800x600'})` }}></div>
+                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" style={{ backgroundImage: `url(${featuredPost.featured_image?.original_url || 'https://placehold.co/800x600'})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1A] lg:bg-gradient-to-r lg:from-transparent to-transparent opacity-80"></div>
               </div>
               <div className="p-10 lg:p-16 flex flex-col justify-center">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
                   <span className="px-3 py-1 rounded-full bg-accent/10 text-accent font-medium">Article</span>
-                  <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(featuredPost.published_at || featuredPost.created_at).toLocaleDateString()}</span>
+                  <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(featuredPost.publish_at || featuredPost.created_at).toLocaleDateString()}</span>
                 </div>
                 <h3 className="text-3xl md:text-4xl font-heading font-bold text-white mb-6 group-hover:text-accent transition-colors leading-tight">
                   {featuredPost.title}
@@ -97,7 +97,7 @@ export function BlogListClient() {
               {regularPosts.map((post: BlogPost) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-300 hover:-translate-y-1">
                   <div className="relative h-56 overflow-hidden">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${post.featured_image || 'https://placehold.co/600x400'})` }}></div>
+                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${post.featured_image?.original_url || 'https://placehold.co/600x400'})` }}></div>
                     <div className="absolute top-4 left-4">
                       <span className="px-3 py-1 rounded-full bg-[#0A0F1A]/80 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider border border-white/10">
                         Article
@@ -106,7 +106,7 @@ export function BlogListClient() {
                   </div>
                   <div className="p-6 flex flex-col flex-grow">
                     <div className="flex justify-between items-center text-xs text-muted-foreground mb-4">
-                      <span className="flex items-center gap-1.5"><Calendar size={14} /> {new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+                      <span className="flex items-center gap-1.5"><Calendar size={14} /> {new Date(post.publish_at || post.created_at).toLocaleDateString()}</span>
                     </div>
                     <h3 className="text-xl font-heading font-bold text-white mb-3 group-hover:text-accent transition-colors leading-snug">
                       {post.title}
