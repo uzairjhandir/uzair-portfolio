@@ -174,8 +174,16 @@ Route::prefix('v1')->group(function () {
     // ── Module 15: Newsletter — Admin (auth required) ─────────────────────────
     Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('admin/newsletter/subscribers',          [\App\Modules\Newsletter\NewsletterController::class, 'subscribers']);
+        Route::get('admin/newsletter/subscribers/{uuid}',   [\App\Modules\Newsletter\NewsletterController::class, 'showSubscriber']);
+        Route::delete('admin/newsletter/subscribers/{uuid}',[\App\Modules\Newsletter\NewsletterController::class, 'destroySubscriber']);
         Route::get('admin/newsletter/campaigns',            [\App\Modules\Newsletter\NewsletterController::class, 'campaigns']);
         Route::post('admin/newsletter/campaigns',           [\App\Modules\Newsletter\NewsletterController::class, 'storeCampaign']);
+        Route::get('admin/newsletter/campaigns/{uuid}',     [\App\Modules\Newsletter\NewsletterController::class, 'showCampaign']);
+        Route::put('admin/newsletter/campaigns/{uuid}',     [\App\Modules\Newsletter\NewsletterController::class, 'updateCampaign']);
+        Route::delete('admin/newsletter/campaigns/{uuid}',  [\App\Modules\Newsletter\NewsletterController::class, 'destroyCampaign']);
+        Route::get('admin/newsletter/lists',                [\App\Modules\Newsletter\NewsletterController::class, 'adminLists']);
+        Route::post('admin/newsletter/lists',               [\App\Modules\Newsletter\NewsletterController::class, 'storeList']);
+        Route::delete('admin/newsletter/lists/{uuid}',      [\App\Modules\Newsletter\NewsletterController::class, 'destroyList']);
     });
 
     // ── Module 16: Downloads ──────────────────────────────────────────────────
@@ -207,7 +215,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Public Navigation Endpoint (No auth required)
-    Route::get('navigation/{location}', [\App\Http\Controllers\Api\V1\NavigationController::class, 'showByLocation']);
+    Route::get('navigation', [\App\Http\Controllers\Api\V1\NavigationController::class, 'index']);
 
     // ── Module 19: Enterprise Dashboard ───────────────────────────────────────
     Route::middleware(['auth:sanctum'])->prefix('admin/dashboard')->group(function () {

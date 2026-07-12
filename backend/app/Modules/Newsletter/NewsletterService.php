@@ -3,6 +3,7 @@
 namespace App\Modules\Newsletter;
 
 use Illuminate\Support\Str;
+use App\Events\NewsletterSubscribeRequested;
 
 /**
  * Newsletter subscription service.
