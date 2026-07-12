@@ -23,14 +23,7 @@ class PortfolioController extends AbstractContentController
     protected string $modelClass    = Portfolio::class;
     protected string $resourceClass = PortfolioResource::class;
 
-    /**
-     * 'featuredImage' is deliberately excluded: unlike Blog (which has a
-     * dedicated featured_image_id column + belongsTo), Portfolio relies on
-     * the shared HasContentMedia trait's featuredImage(), which calls
-     * ->first() and therefore is not eager-loadable. PortfolioResource
-     * resolves it lazily instead.
-     */
-    private const EAGER = ['gallery', 'author', 'seo', 'terms'];
+    private const EAGER = ['featuredImage', 'gallery', 'author', 'seo', 'terms'];
 
     public function __construct(
         \App\Services\ContentPublishingService $publishingService,

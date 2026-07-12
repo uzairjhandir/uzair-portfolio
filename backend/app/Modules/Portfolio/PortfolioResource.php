@@ -12,10 +12,12 @@ class PortfolioResource extends AbstractContentResource
     {
         return array_merge(parent::toArray($request), [
             'content' => $this->content,
-            // Not eager-loadable (see PortfolioController::EAGER) — resolved lazily here.
-            // Must call featuredImage() directly: property access triggers Eloquent's
-            // relation-resolution magic, which requires a Relation return, not Model|null.
-            'featured_image' => ($img = $this->featuredImage()) ? new MediaResource($img) : null,
+            // featuredImage() is a to-many pivot relation (see HasContentMedia); take
+            // the first item of the eager-loaded collection rather than the base
+            // resource's whenLoaded('featuredImage') handling (which assumes singular).
+            'featured_image' => $this->whenLoaded('featuredImage', fn() =>
+                ($img = $this->featuredImage->first()) ? new MediaResource($img) : null
+            ),
             // Portfolio-specific fields
             'client_name'      => $this->client_name,
             'project_url'      => $this->project_url,
