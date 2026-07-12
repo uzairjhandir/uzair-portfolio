@@ -12,13 +12,12 @@ import {
   Settings,
   Image as ImageIcon,
   Mail,
-  MessageSquare,
   ArrowRightLeft,
-  Activity,
   HeartPulse,
   Send,
   Workflow,
-  Bell
+  Bell,
+  Search as SearchIcon,
 } from "lucide-react";
 import * as React from "react";
 
@@ -58,10 +57,6 @@ export const adminNavigation: NavItem[] = [
         title: "Settings",
         href: "/admin/homepage/settings",
         permission: "homepage.settings.view",
-      },
-      {
-        title: "Footer",
-        href: "/admin/footer",
       },
     ]
   },
@@ -106,11 +101,6 @@ export const adminNavigation: NavItem[] = [
     href: "/admin/crm",
   },
   {
-    title: "Contact Submissions",
-    icon: MessageSquare,
-    href: "/admin/contact",
-  },
-  {
     title: "Newsletter",
     icon: Send,
     href: "/admin/newsletter",
@@ -141,14 +131,14 @@ export const adminNavigation: NavItem[] = [
     href: "/admin/roles",
   },
   {
-    title: "Activity Logs",
-    icon: Activity,
-    href: "/admin/activity-logs",
-  },
-  {
     title: "System Health",
     icon: HeartPulse,
     href: "/admin/system-health",
+  },
+  {
+    title: "Search",
+    icon: SearchIcon,
+    href: "/admin/search",
   },
   {
     title: "Settings",

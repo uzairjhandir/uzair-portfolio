@@ -27,11 +27,17 @@ class DefaultSettingsSeeder extends Seeder
             'Cache' => ['icon' => 'lucide-database', 'sort_order' => 13],
             'Backup' => ['icon' => 'lucide-hard-drive', 'sort_order' => 14],
             'API' => ['icon' => 'lucide-code', 'sort_order' => 15],
+            // Slug forced to 'livechat' (not the auto-slugified 'live-chat') because
+            // SettingService::get() derives the cache/lookup group from the setting
+            // key's first dot-segment, and every LiveChat driver reads keys prefixed
+            // 'livechat.*' (see App\Modules\LiveChat\Drivers\*) — a hyphenated slug
+            // would never match and the settings would silently never resolve.
+            'Live Chat' => ['icon' => 'lucide-message-circle', 'sort_order' => 16, 'slug' => 'livechat'],
         ];
 
         foreach ($categories as $name => $meta) {
             $category = SettingCategory::firstOrCreate(
-                ['slug' => Str::slug($name)],
+                ['slug' => $meta['slug'] ?? Str::slug($name)],
                 [
                     'name' => $name,
                     'icon' => $meta['icon'],
@@ -69,18 +75,52 @@ class DefaultSettingsSeeder extends Seeder
                     ['key' => 'email.smtp_port', 'default_value' => '2525', 'type' => 'integer'],
                     ['key' => 'email.smtp_username', 'default_value' => '', 'type' => 'string'],
                     ['key' => 'email.smtp_password', 'default_value' => '', 'type' => 'password', 'is_encrypted' => true],
+                    ['key' => 'email.smtp_encryption', 'default_value' => 'tls', 'type' => 'string'],
+                    ['key' => 'email.from_address', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'email.from_name', 'default_value' => 'Uzair Portfolio', 'type' => 'string'],
+                ];
+                break;
+            case 'social':
+                $settings = [
+                    ['key' => 'social.github', 'default_value' => '', 'type' => 'string', 'is_public' => true],
+                    ['key' => 'social.linkedin', 'default_value' => '', 'type' => 'string', 'is_public' => true],
+                    ['key' => 'social.twitter', 'default_value' => '', 'type' => 'string', 'is_public' => true],
+                    ['key' => 'social.upwork', 'default_value' => '', 'type' => 'string', 'is_public' => true],
+                ];
+                break;
+            case 'analytics':
+                $settings = [
+                    ['key' => 'analytics.ga4_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'analytics.gtm_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'analytics.clarity_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'analytics.meta_pixel_id', 'default_value' => '', 'type' => 'string'],
+                ];
+                break;
+            case 'livechat':
+                $settings = [
+                    ['key' => 'livechat.enabled', 'default_value' => false, 'type' => 'boolean'],
+                    ['key' => 'livechat.provider', 'default_value' => 'none', 'type' => 'string'],
+                    ['key' => 'livechat.tawkto.property_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'livechat.tawkto.widget_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'livechat.crisp.website_id', 'default_value' => '', 'type' => 'string'],
+                    ['key' => 'livechat.position', 'default_value' => 'bottom-right', 'type' => 'string'],
+                    ['key' => 'livechat.mobile_enabled', 'default_value' => true, 'type' => 'boolean'],
                 ];
                 break;
             // Additional categories can be seeded here...
         }
 
         foreach ($settings as $setting) {
+            // Pass raw PHP values, not pre-encoded JSON — Setting::setValueAttribute()
+            // already json_encode()s on assignment (and default_value's 'json' cast
+            // does the same), so encoding here too double-encodes every seeded
+            // default (stored as e.g. "\"bottom-right\"" instead of "bottom-right").
             Setting::firstOrCreate(
                 ['key' => $setting['key']],
                 [
                     'setting_category_id' => $category->id,
-                    'default_value' => json_encode($setting['default_value']),
-                    'value' => json_encode($setting['default_value']),
+                    'default_value' => $setting['default_value'],
+                    'value' => $setting['default_value'],
                     'type' => $setting['type'],
                     'is_public' => $setting['is_public'] ?? false,
                     'is_encrypted' => $setting['is_encrypted'] ?? false,

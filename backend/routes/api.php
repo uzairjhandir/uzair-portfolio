@@ -67,6 +67,8 @@ Route::prefix('v1')->group(function () {
 
         Route::get('settings', [\App\Http\Controllers\Api\V1\SettingController::class, 'index']);
         Route::put('settings', [\App\Http\Controllers\Api\V1\SettingController::class, 'update']);
+        Route::post('settings/email/test-connection', [\App\Http\Controllers\Api\V1\SettingController::class, 'testEmailConnection']);
+        Route::post('settings/email/test-send',       [\App\Http\Controllers\Api\V1\SettingController::class, 'testEmailSend']);
 
         // Media Library Routes
         Route::apiResource('media', \App\Http\Controllers\Api\V1\MediaController::class)->parameters(['media' => 'uuid']);
@@ -237,12 +239,35 @@ Route::prefix('v1')->group(function () {
     Route::get('search/related',  [\App\Modules\Search\SearchController::class, 'related']);
     
     Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-        Route::post('search/rebuild',   [\App\Modules\Search\SearchController::class, 'rebuild']);
-        Route::delete('search/index',   [\App\Modules\Search\SearchController::class, 'flush']);
+        Route::post('search/rebuild',      [\App\Modules\Search\SearchController::class, 'rebuild']);
+        Route::delete('search/index',      [\App\Modules\Search\SearchController::class, 'flush']);
+        Route::get('admin/search/health',  [\App\Modules\Search\SearchController::class, 'health']);
+        Route::get('admin/search/global',  [\App\Modules\Search\SearchController::class, 'adminGlobal']);
     });
 
     // Public Navigation Endpoint (No auth required)
     Route::get('navigation', [\App\Http\Controllers\Api\V1\NavigationController::class, 'index']);
+
+    // ── Module 18b: SEO Redirects & URL Rewrites (auth required) ──────────────
+    // RedirectController/UrlRewriteController were fully built with CRUD but
+    // never registered here — CheckRedirectsMiddleware/CheckUrlRewritesMiddleware
+    // already run on every request, but admins had no way to manage the data.
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+        Route::get('admin/redirects',            [\App\Modules\Seo\Redirects\RedirectController::class, 'index']);
+        Route::post('admin/redirects',           [\App\Modules\Seo\Redirects\RedirectController::class, 'store']);
+        Route::put('admin/redirects/{uuid}',     [\App\Modules\Seo\Redirects\RedirectController::class, 'update']);
+        Route::delete('admin/redirects/{uuid}',  [\App\Modules\Seo\Redirects\RedirectController::class, 'destroy']);
+        Route::post('admin/redirects/bulk',      [\App\Modules\Seo\Redirects\RedirectController::class, 'bulk']);
+
+        Route::get('admin/url-rewrites',              [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'index']);
+        Route::post('admin/url-rewrites',             [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'store']);
+        Route::put('admin/url-rewrites/{uuid}',       [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'update']);
+        Route::delete('admin/url-rewrites/{uuid}',    [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'destroy']);
+        Route::post('admin/url-rewrites/bulk',        [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'bulk']);
+        Route::post('admin/url-rewrites/{uuid}/test', [\App\Modules\Seo\UrlRewrites\UrlRewriteController::class, 'test']);
+    });
+    // Public — Next.js edge middleware fetches this to cache redirects
+    Route::get('redirects/export', [\App\Modules\Seo\Redirects\RedirectController::class, 'export']);
 
     // ── Module 19: Enterprise Dashboard ───────────────────────────────────────
     Route::middleware(['auth:sanctum'])->prefix('admin/dashboard')->group(function () {

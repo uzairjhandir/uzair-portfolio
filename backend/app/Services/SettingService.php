@@ -17,9 +17,14 @@ class SettingService
         $group = explode('.', $key)[0];
         
         $settings = Cache::rememberForever("settings.{$group}", function () use ($group) {
+            // ->get()->mapWithKeys() (not ->pluck() on the query builder) so each
+            // Setting is hydrated and `$s->value` runs through the model's
+            // accessor — JSON-decoding and decrypting is-encrypted values.
+            // A raw pluck() reads the column directly and returns the still
+            // JSON-encoded (and still-encrypted) string.
             return Setting::whereHas('category', function($q) use ($group) {
                 $q->where('slug', $group);
-            })->pluck('value', 'key')->toArray();
+            })->get()->mapWithKeys(fn(Setting $s) => [$s->key => $s->value])->toArray();
         });
 
         // The Setting model accessor handles ENV overrides when retrieving via eloquent, 

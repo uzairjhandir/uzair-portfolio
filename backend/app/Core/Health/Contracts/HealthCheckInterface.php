@@ -2,6 +2,8 @@
 
 namespace App\Core\Health\Contracts;
 
+use App\Core\Health\HealthCheckResult;
+
 /**
  * Health Check Interface
  *

@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import { settingsKeys } from './keys';
-import { Setting } from './types';
+import { SettingsGrouped } from './types';
 
 export const useSettingsQuery = () => {
   return useQuery({
     queryKey: settingsKeys.lists(),
-    queryFn: async (): Promise<Setting[]> => {
+    queryFn: async (): Promise<SettingsGrouped> => {
       const response = await apiClient.get('/settings');
-      return response.data.data; 
+      return response.data.data;
     },
   });
 };

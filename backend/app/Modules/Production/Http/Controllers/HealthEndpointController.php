@@ -58,13 +58,9 @@ class HealthEndpointController
     public function details(): JsonResponse
     {
         // Authenticated users only, or internal network IPs only.
-        // Resolves the HealthCheckManager array
         $manager = app(\App\Core\Health\HealthCheckManager::class);
-        $report = $manager->checkAll();
+        $report  = $manager->collect();
 
-        return response()->json([
-            'status' => $report->isHealthy() ? 'ok' : 'degraded',
-            'checks' => $report->toArray()
-        ]);
+        return response()->json($report->toArray());
     }
 }

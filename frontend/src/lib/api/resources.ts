@@ -5,31 +5,10 @@ export interface ResourceMeta {
 }
 
 export const Resources: Record<string, ResourceMeta> = {
-  hero: {
-    module: "homepage",
-    resource: "hero",
-    endpoint: "",
-  },
-  services: {
-    module: "homepage",
-    resource: "services",
-    endpoint: "",
-  },
-  skills: {
-    module: "homepage",
-    resource: "skills",
-    endpoint: "",
-  },
-  testimonials: {
-    module: "homepage",
-    resource: "testimonials",
-    endpoint: "",
-  },
-  "client-logos": {
-    module: "homepage",
-    resource: "client-logos",
-    endpoint: "",
-  },
+  // Homepage sections (hero/services/skills/testimonials/client-logos/etc.)
+  // are NOT flat CRUD resources — there is no backend route for them. They
+  // are managed through the Pages -> Blocks -> BlockTypes architecture via
+  // /admin/homepage-builder, not through this generic resource config.
   blog: {
     module: "blog",
     resource: "posts",
@@ -75,24 +54,9 @@ export const Resources: Record<string, ResourceMeta> = {
     resource: "media",
     endpoint: "",
   },
-  "activity-logs": {
-    module: "system",
-    resource: "activity-logs",
-    endpoint: "",
-  },
-  "system-health": {
-    module: "system",
-    resource: "system-health",
-    endpoint: "",
-  },
   pages: {
     module: "pages",
     resource: "pages",
-    endpoint: "",
-  },
-  contact: {
-    module: "contact",
-    resource: "contact",
     endpoint: "",
   },
   navigation: {
@@ -100,15 +64,12 @@ export const Resources: Record<string, ResourceMeta> = {
     resource: "navigation",
     endpoint: "",
   },
-  footer: {
-    module: "footer",
-    resource: "footer",
-    endpoint: "",
-  },
   redirects: {
     module: "redirects",
     resource: "redirects",
-    endpoint: "",
+    // Real backend routes are admin/redirects, not /redirects (that path is
+    // taken by the public redirects/export endpoint for the edge middleware).
+    endpoint: "/admin/redirects",
   },
   "cv-manager": {
     module: "cv-manager",
