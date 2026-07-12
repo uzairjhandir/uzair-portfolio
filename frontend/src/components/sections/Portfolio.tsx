@@ -6,6 +6,19 @@ import { ArrowRight, ExternalLink, Activity, Clock } from "lucide-react";
 import { siGithub } from "simple-icons";
 import Link from "next/link";
 import { usePortfolioListQuery } from "@/lib/query/portfolio/queries";
+import { PortfolioProject } from "@/lib/query/portfolio/types";
+
+/**
+ * category_id/performance/overview are not part of the real Portfolio API —
+ * this card was built against placeholder data. Kept optional so the display
+ * degrades gracefully instead of being redesigned here (out of Phase 5 scope).
+ */
+type DisplayPortfolioProject = PortfolioProject & {
+  category_id?: string;
+  performance?: { lighthouse?: number; loadTime?: string };
+  overview?: string;
+  description?: string;
+};
 
 export function Portfolio() {
   const { data: response, isLoading } = usePortfolioListQuery();
@@ -44,15 +57,15 @@ export function Portfolio() {
             <div className="col-span-2 text-center text-muted-foreground py-10 animate-pulse">Loading portfolio...</div>
           ) : portfolioData.length === 0 ? (
             <div className="col-span-2 text-center text-muted-foreground py-10">No portfolio projects found.</div>
-          ) : portfolioData.slice(0, 4).map((project: any, index: number) => (
-            <FadeIn key={project.id || project.slug} delay={index * 0.1}>
+          ) : portfolioData.slice(0, 4).map((project: DisplayPortfolioProject, index: number) => (
+            <FadeIn key={project.uuid} delay={index * 0.1}>
               <TiltCard className="portfolio-card group p-0 overflow-hidden bg-[#0A0F1A] border border-white/10 rounded-2xl flex flex-col h-full hover:border-white/20 transition-colors">
                 
                 {/* Image Section */}
                 <div className="relative h-64 w-full overflow-hidden shrink-0">
                   <div 
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
-                    style={{ backgroundImage: `url(${project.featured_image || 'https://placehold.co/800x600'})` }}
+                    style={{ backgroundImage: `url(${project.featured_image?.original_url || 'https://placehold.co/800x600'})` }}
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1A] via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500"></div>
                 </div>
@@ -91,9 +104,9 @@ export function Portfolio() {
                   </p>
                   
                   <div className="flex flex-wrap gap-2 mb-8">
-                    {(project.technologies || []).slice(0, 4).map((tech: string) => (
-                      <span key={tech} className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-300">
-                        {tech}
+                    {(project.technologies || []).slice(0, 4).map((tech: { uuid: string; name: string }) => (
+                      <span key={tech.uuid} className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-300">
+                        {tech.name}
                       </span>
                     ))}
                     {(project.technologies || []).length > 4 && (

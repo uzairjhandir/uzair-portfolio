@@ -1,53 +1,74 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { PortfolioRecord } from "./types";
+import { PortfolioProject } from "@/lib/query/portfolio/types";
 import { StatusBadge } from "@/components/admin/ui/StatusBadge";
-import { ExternalLink, Link2 } from "lucide-react";
 
-export const portfolioColumns: ColumnDef<PortfolioRecord>[] = [
+export const portfolioColumns: ColumnDef<PortfolioProject>[] = [
   {
     accessorKey: "featured_image",
     header: "Cover",
     cell: ({ row }) => (
-      <div className="w-12 h-12 rounded overflow-hidden bg-muted border">
-        {row.original.featured_image ? (
-          <img src={row.original.featured_image} alt="Cover" className="w-full h-full object-cover" />
+      <div className="w-12 h-8 rounded overflow-hidden bg-muted">
+        {row.original.featured_image?.original_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={row.original.featured_image.original_url} alt="Cover" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground bg-primary/10">No Img</div>
+          <div className="w-full h-full bg-primary/10" />
         )}
       </div>
-    )
+    ),
   },
   {
     accessorKey: "title",
-    header: "Project",
+    header: "Title",
     cell: ({ row }) => (
       <div>
         <p className="font-medium">{row.original.title}</p>
-        <p className="text-xs text-muted-foreground">{row.original.client || "Personal Project"}</p>
+        <p className="text-xs text-muted-foreground">{row.original.slug}</p>
       </div>
-    )
+    ),
   },
   {
-    accessorKey: "links",
-    header: "Links",
+    accessorKey: "client_name",
+    header: "Client",
     cell: ({ row }) => (
-      <div className="flex gap-2 text-muted-foreground">
-        {row.original.live_url && (
-          <a href={row.original.live_url} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        )}
-        {row.original.github_url && (
-          <a href={row.original.github_url} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">
-            <Link2 className="w-4 h-4" />
-          </a>
+      <span className="text-sm">{row.original.client_name || '—'}</span>
+    ),
+  },
+  {
+    accessorKey: "technologies",
+    header: "Technologies",
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1 max-w-[200px]">
+        {row.original.technologies.slice(0, 3).map((t) => (
+          <span key={t.uuid} className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{t.name}</span>
+        ))}
+        {row.original.technologies.length > 3 && (
+          <span className="text-xs text-muted-foreground">+{row.original.technologies.length - 3}</span>
         )}
       </div>
-    )
+    ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status as any} />
-  }
+    cell: ({ row }) => <StatusBadge status={row.original.status} />,
+  },
+  {
+    accessorKey: "completion_date",
+    header: "Completed",
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.completion_date ? new Date(row.original.completion_date).toLocaleDateString() : "—"}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "updated_at",
+    header: "Updated",
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {new Date(row.original.updated_at).toLocaleDateString()}
+      </span>
+    ),
+  },
 ];
