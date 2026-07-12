@@ -102,15 +102,18 @@ export function FilterBar({ groups, activeFilters, onFilterChange, onClearFilter
   )
 }
 
-// Add this mock definition at the bottom so TypeScript compiles cleanly for now
+// dropdown-menu.tsx only exports DropdownMenuCheckboxItem, not a plain
+// DropdownMenuItem — this renders as an unstyled div wrapper, not a Radix
+// primitive, so it uses standard div ref/props types rather than borrowing
+// the checkbox item's (which required `any` casts to force-fit).
 const DropdownMenuItem = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuCheckboxItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuCheckboxItem>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div
-    ref={ref as any}
+    ref={ref}
     className={`relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${className}`}
-    {...props as any}
+    {...props}
   />
 ))
 DropdownMenuItem.displayName = "DropdownMenuItem"

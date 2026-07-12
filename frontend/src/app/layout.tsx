@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { Inter, Poppins, JetBrains_Mono } from "next/font/google";
 import axios from "axios";
 import "./globals.css";
+import { SettingCategory } from "@/lib/query/settings/types";
 import { LenisProvider } from "@/providers/lenis-provider";
 import { CursorProvider } from "@/providers/cursor-provider";
 import { Navbar } from "@/components/layout/Navbar";
@@ -54,10 +55,10 @@ async function getPublicSettings(): Promise<Record<string, string>> {
     const res = await axios.get(`${API_URL}/settings/public`);
     const categories = res.data?.data || {};
     const flat: Record<string, string> = {};
-    for (const category of Object.values(categories) as any[]) {
+    for (const category of Object.values(categories) as SettingCategory[]) {
       for (const setting of category.settings || []) {
         if (setting.value !== null && setting.value !== undefined) {
-          flat[setting.key] = setting.value;
+          flat[setting.key] = String(setting.value);
         }
       }
     }

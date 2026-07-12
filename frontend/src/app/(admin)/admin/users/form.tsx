@@ -18,7 +18,7 @@ interface UsersFormProps {
 
 export function UsersForm({ initialData, onSubmit, isSubmitting, mode }: UsersFormProps) {
   const form = useForm<UsersFormValues>({
-    resolver: zodResolver(usersSchema) as any,
+    resolver: zodResolver(usersSchema),
     defaultValues: initialData || {
       name: "",
       email: "",
@@ -29,12 +29,12 @@ export function UsersForm({ initialData, onSubmit, isSubmitting, mode }: UsersFo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
+      <form onSubmit={form.handleSubmit((data) => onSubmit(data))} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="name"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem className="col-span-2 sm:col-span-1">
                 <FormLabel>Name</FormLabel>
                 <FormControl>
@@ -48,7 +48,7 @@ export function UsersForm({ initialData, onSubmit, isSubmitting, mode }: UsersFo
           <FormField
             control={form.control}
             name="email"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem className="col-span-2 sm:col-span-1">
                 <FormLabel>Email</FormLabel>
                 <FormControl>
@@ -62,7 +62,7 @@ export function UsersForm({ initialData, onSubmit, isSubmitting, mode }: UsersFo
           <FormField
             control={form.control}
             name="role"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Role</FormLabel>
                 <Select disabled={mode === "view"} onValueChange={field.onChange} defaultValue={field.value}>
@@ -86,7 +86,7 @@ export function UsersForm({ initialData, onSubmit, isSubmitting, mode }: UsersFo
           <FormField
             control={form.control}
             name="status"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Status</FormLabel>
                 <Select disabled={mode === "view"} onValueChange={field.onChange} defaultValue={field.value}>

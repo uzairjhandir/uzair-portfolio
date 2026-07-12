@@ -32,7 +32,7 @@ export function MediaPickerField({ value, onChange, label = 'Media' }: MediaPick
     const file = e.target.files?.[0];
     if (!file) return;
     const result = await uploadMutation.mutateAsync({ file });
-    const media = (result as any).data;
+    const media = result.data;
     if (media) {
       onChange({ id: media.uuid, url: media.original_url });
       setOpen(false);

@@ -14,9 +14,15 @@ interface UseCrudListOptions {
 export const useCrudList = <T>({ queryKey, resourceKey, filters, defaultSort, enabled = true }: UseCrudListOptions) => {
   const service = createGenericService<T>(resourceKey);
 
+  // useCrudFilters always populates sort_by/sort_dir with its own hardcoded
+  // default, so this only takes effect for filter objects built without it.
+  const effectiveFilters = defaultSort && !filters.sort_by
+    ? { ...filters, sort_by: defaultSort.field, sort_dir: defaultSort.order }
+    : filters;
+
   return useQuery({
-    queryKey: [...queryKey, filters],
-    queryFn: () => service.getList(filters),
+    queryKey: [...queryKey, effectiveFilters],
+    queryFn: () => service.getList(effectiveFilters),
     enabled,
     staleTime: 1000 * 60, // 1 minute
   });

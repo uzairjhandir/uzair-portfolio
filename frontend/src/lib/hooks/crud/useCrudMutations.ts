@@ -28,7 +28,7 @@ export const useCrudMutations = <T extends { id: string | number }>({ queryKey, 
     },
   });
 
-  const updateMutation = useMutation<any, Error, { id: string | number; data: Partial<T> }, MutationContext>({
+  const updateMutation = useMutation<{ data: T }, Error, { id: string | number; data: Partial<T> }, MutationContext>({
     mutationFn: ({ id, data }: { id: string | number; data: Partial<T> }) => service.update(id, data),
     onMutate: async (variables) => {
       // Cancel any outgoing refetches so they don't overwrite optimistic update
@@ -64,7 +64,7 @@ export const useCrudMutations = <T extends { id: string | number }>({ queryKey, 
     },
   });
 
-  const deleteMutation = useMutation<any, Error, string | number, MutationContext>({
+  const deleteMutation = useMutation<void, Error, string | number, MutationContext>({
     mutationFn: (id) => service.delete(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey });

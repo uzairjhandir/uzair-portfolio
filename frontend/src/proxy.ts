@@ -1,31 +1,21 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+/**
+ * Next.js Proxy (Middleware equivalent)
+ *
+ * Since Bearer tokens are stored in localStorage (not cookies), we cannot
+ * inspect them in middleware (no DOM access). Auth guard is handled client-side
+ * via the AuthGuard component which checks localStorage and redirects.
+ *
+ * This proxy only handles:
+ * - Basic route structure (no redirect loops)
+ */
+// Next.js requires this exact (request: NextRequest) signature for the
+// proxy/middleware entry point even though it's unused here.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Protect /admin routes (excluding /admin/login)
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
-    // Check if Laravel Sanctum cookie exists (laravel_session or XSRF-TOKEN)
-    const sessionCookie = request.cookies.get('laravel_session');
-    
-    if (!sessionCookie) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/admin/login';
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // Redirect authenticated users away from login
-  if (pathname.startsWith('/admin/login')) {
-    const sessionCookie = request.cookies.get('laravel_session');
-    if (sessionCookie) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/admin/dashboard';
-      return NextResponse.redirect(url);
-    }
-  }
-
+  // Let all requests through — auth is enforced client-side by AuthGuard
   return NextResponse.next();
 }
 

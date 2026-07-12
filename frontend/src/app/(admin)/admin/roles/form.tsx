@@ -25,7 +25,7 @@ const availablePermissions = [
 
 export function RolesForm({ initialData, onSubmit, isSubmitting, mode }: RolesFormProps) {
   const form = useForm<RolesFormValues>({
-    resolver: zodResolver(rolesSchema) as any,
+    resolver: zodResolver(rolesSchema),
     defaultValues: initialData || {
       name: "",
       description: "",
@@ -35,12 +35,12 @@ export function RolesForm({ initialData, onSubmit, isSubmitting, mode }: RolesFo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
+      <form onSubmit={form.handleSubmit((data) => onSubmit(data))} className="space-y-6">
         <div className="grid grid-cols-1 gap-4">
           <FormField
             control={form.control}
             name="name"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Role Name</FormLabel>
                 <FormControl>
@@ -54,7 +54,7 @@ export function RolesForm({ initialData, onSubmit, isSubmitting, mode }: RolesFo
           <FormField
             control={form.control}
             name="description"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
@@ -68,7 +68,7 @@ export function RolesForm({ initialData, onSubmit, isSubmitting, mode }: RolesFo
           <FormField
             control={form.control}
             name="permissions"
-            render={({ field }: any) => {
+            render={({ field }) => {
               const selected = field.value || []
               return (
                 <FormItem>

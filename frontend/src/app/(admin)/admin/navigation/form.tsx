@@ -2,11 +2,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 
-export function Form({ initialData, onSubmit, mode }: any) {
+interface StubRow {
+  id: string | number;
+  title: string;
+}
+
+interface StubFormProps {
+  initialData?: StubRow;
+  onSubmit: (data: Partial<StubRow>) => void;
+  mode: "create" | "edit" | "view" | "clone";
+}
+
+export function Form({ initialData, onSubmit, mode }: StubFormProps) {
   return (
     <form onSubmit={(e) => {
       e.preventDefault();
-      onSubmit({ title: (e.target as any).title.value });
+      const title = (e.currentTarget.elements.namedItem('title') as HTMLInputElement).value;
+      onSubmit({ title });
     }} className="space-y-4">
       <div className="space-y-2">
         <Label>Title</Label>

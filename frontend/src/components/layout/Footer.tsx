@@ -31,7 +31,7 @@ export function Footer() {
       await subscribe(email);
       setStatus("success");
       setEmail("");
-    } catch (err) {
+    } catch {
       setStatus("error");
     }
   };

@@ -55,7 +55,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
             {content.title && <h2 className="text-4xl font-heading font-bold text-white mb-12 text-center">{content.title}</h2>}
             {Array.isArray(content.items) && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {content.items.map((item: any, idx: number) => (
+                {content.items.map((item, idx: number) => (
                   <div key={idx} className="p-8 rounded-2xl bg-white/5 border border-white/10">
                     {item.title && <h3 className="text-xl font-heading font-bold text-white mb-3">{item.title}</h3>}
                     {item.description && <p className="text-muted-foreground text-sm">{item.description}</p>}
@@ -74,7 +74,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
             {content.title && <h2 className="text-4xl font-heading font-bold text-white mb-12 text-center">{content.title}</h2>}
             {Array.isArray(content.items) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {content.items.map((item: any, idx: number) => (
+                {content.items.map((item, idx: number) => (
                   <div key={idx} className="p-8 rounded-2xl bg-white/5 border border-white/10">
                     {item.quote && <p className="text-white italic mb-4">&ldquo;{item.quote}&rdquo;</p>}
                     {item.author && <p className="text-muted-foreground text-sm font-medium">{item.author}</p>}
@@ -93,7 +93,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
             {content.title && <h2 className="text-4xl font-heading font-bold text-white mb-12 text-center">{content.title}</h2>}
             {Array.isArray(content.items) && (
               <div className="space-y-4">
-                {content.items.map((item: any, idx: number) => (
+                {content.items.map((item, idx: number) => (
                   <div key={idx} className="p-6 rounded-xl bg-white/5 border border-white/10">
                     {item.question && <h3 className="text-white font-semibold mb-2">{item.question}</h3>}
                     {item.answer && <p className="text-muted-foreground text-sm">{item.answer}</p>}
@@ -111,7 +111,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
           <div className="container mx-auto px-6">
             {Array.isArray(content.items) && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                {content.items.map((item: any, idx: number) => (
+                {content.items.map((item, idx: number) => (
                   <div key={idx}>
                     {item.value && <div className="text-4xl font-heading font-extrabold text-white mb-2">{item.value}</div>}
                     {item.label && <div className="text-muted-foreground text-sm">{item.label}</div>}
@@ -129,7 +129,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
           <div className="container mx-auto px-6">
             {Array.isArray(content.logos) && (
               <div className="flex flex-wrap items-center justify-center gap-12 opacity-60">
-                {content.logos.map((logo: any, idx: number) => (
+                {content.logos.map((logo, idx: number) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img key={idx} src={logo.url} alt={logo.name || "Client logo"} className="h-8 object-contain" />
                 ))}
@@ -159,7 +159,7 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
             {content.title && <h2 className="text-4xl font-heading font-bold text-white mb-12 text-center">{content.title}</h2>}
             {Array.isArray(content.items) && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {content.items.map((item: any, idx: number) => (
+                {content.items.map((item, idx: number) => (
                   <div key={idx} className="p-6 rounded-xl bg-white/5 border border-white/10">
                     {item.title && <h3 className="text-white font-semibold mb-2">{item.title}</h3>}
                     {item.description && <p className="text-muted-foreground text-sm">{item.description}</p>}

@@ -12,85 +12,97 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 export interface SidebarItem {
   title: string;
   href?: string;
-  icon?: React.ElementType;
+  icon?: React.ElementType<{ className?: string }>;
   children?: SidebarItem[];
+}
+
+function NavItemComponent({ 
+  item, 
+  depth = 0, 
+  pathname, 
+  hasPermission 
+}: { 
+  item: NavItem; 
+  depth?: number; 
+  pathname: string; 
+  hasPermission: (permission: string) => boolean;
+}) {
+  const isActive = pathname === item.href || !!(item.href && pathname.startsWith(`${item.href}/`));
+  const isChildActive = item.children?.some(child => pathname === child.href || !!(child.href && pathname.startsWith(`${child.href}/`)));
+  const [isOpen, setIsOpen] = React.useState(isActive || isChildActive);
+
+  // Permission checks must run after all hooks — hooks can't be called
+  // conditionally, and permission state can change after login resolves.
+  if (item.permission && !hasPermission(item.permission)) return null;
+  if (item.hidden) return null;
+
+  const Icon = item.icon;
+
+  if (item.children && item.children.length > 0) {
+    return (
+      <div className="space-y-1">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={cn(
+            "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+            isOpen ? "text-foreground" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+          )}
+          style={{ paddingLeft: `${depth * 1 + 0.75}rem` }}
+        >
+          <div className="flex items-center gap-3">
+            {Icon && <Icon className={cn("w-5 h-5", isOpen ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />}
+            <span>{item.title}</span>
+          </div>
+          {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        </button>
+
+        {isOpen && (
+          <div className="space-y-1 mt-1">
+            {item.children.map(child => (
+              <NavItemComponent 
+                key={child.href || child.title} 
+                item={child} 
+                depth={depth + 1} 
+                pathname={pathname} 
+                hasPermission={hasPermission} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={item.href || "#"}
+      className={cn(
+        "flex items-center justify-between py-2.5 rounded-lg text-sm font-medium transition-all group relative pr-3",
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+      )}
+      style={{ paddingLeft: `${depth * 1 + 0.75}rem` }}
+    >
+      <div className="flex items-center gap-3">
+        {depth === 0 && isActive && (
+          <div className="absolute left-0 w-1 h-full bg-primary rounded-r-full" />
+        )}
+        {Icon && <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />}
+        <span>{item.title}</span>
+      </div>
+      {item.badge && (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/20 text-primary">
+          {item.badge.text}
+        </span>
+      )}
+    </Link>
+  );
 }
 
 export function Sidebar() {
   const pathname = usePathname();
   const { hasPermission } = usePermissions();
-
-  const renderNavItem = (item: NavItem, depth = 0) => {
-    // Check permissions
-    if (item.permission && !hasPermission(item.permission)) return null;
-    if (item.hidden) return null;
-
-    const isActive = pathname === item.href || (item.href && pathname.startsWith(`${item.href}/`)) || false;
-    const isChildActive = item.children?.some(child => pathname === child.href || (child.href && pathname.startsWith(`${child.href}/`)));
-    const [isOpen, setIsOpen] = React.useState(isActive || isChildActive);
-
-    const Icon = item.icon;
-
-    if (item.children && item.children.length > 0) {
-      return (
-        <div key={item.title} className="space-y-1">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-              isOpen ? "text-foreground" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-            )}
-            style={{ paddingLeft: `${depth * 1 + 0.75}rem` }}
-          >
-            <div className="flex items-center gap-3">
-              {Icon && (() => {
-                const IconToRender = Icon as any;
-                return <IconToRender className={cn("w-5 h-5", isOpen ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />;
-              })()}
-              <span>{item.title}</span>
-            </div>
-            {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
-
-          {isOpen && (
-            <div className="space-y-1 mt-1">
-              {item.children.map(child => renderNavItem(child, depth + 1))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <Link
-        key={item.href || item.title}
-        href={item.href || "#"}
-        className={cn(
-          "flex items-center justify-between py-2.5 rounded-lg text-sm font-medium transition-all group relative pr-3",
-          isActive
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-        )}
-        style={{ paddingLeft: `${depth * 1 + 0.75}rem` }}
-      >
-        <div className="flex items-center gap-3">
-          {depth === 0 && isActive && (
-            <div className="absolute left-0 w-1 h-full bg-primary rounded-r-full" />
-          )}
-          {Icon && (() => {
-            const IconToRender = Icon as any;
-            return <IconToRender className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />;
-          })()}
-          <span>{item.title}</span>
-        </div>
-        {item.badge && (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/20 text-primary">
-            {item.badge.text}
-          </span>
-        )}
-      </Link>
-    );
-  };
 
   return (
     <aside className="w-64 bg-background border-r border-border h-screen flex flex-col fixed left-0 top-0 z-40">
@@ -105,7 +117,15 @@ export function Sidebar() {
           Menu
         </div>
 
-        {adminNavigation.map((item) => renderNavItem(item, 0))}
+        {adminNavigation.map((item) => (
+          <NavItemComponent 
+            key={item.href || item.title} 
+            item={item} 
+            depth={0} 
+            pathname={pathname} 
+            hasPermission={hasPermission} 
+          />
+        ))}
       </div>
 
       <div className="p-4 border-t border-border/50 shrink-0">

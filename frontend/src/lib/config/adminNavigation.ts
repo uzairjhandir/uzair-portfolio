@@ -29,7 +29,7 @@ export interface NavBadge {
 export interface NavItem {
   title: string;
   href?: string;
-  icon?: React.ElementType;
+  icon?: React.ElementType<{ className?: string }>;
   permission?: string;
   hidden?: boolean;
   external?: boolean;

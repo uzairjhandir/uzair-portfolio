@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,6 +41,7 @@ import {
   useRestoreMediaMutation,
 } from '@/lib/query/media/mutations';
 import { Media } from '@/lib/query/media/types';
+import { getErrorMessage } from '@/lib/utils';
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -58,7 +59,7 @@ export default function MediaLibraryPage() {
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
 
-  const filters: Record<string, any> = { per_page: 60 };
+  const filters: Record<string, unknown> = { per_page: 60 };
   if (search) filters.search = search;
   if (mimeFilter !== 'all') filters.mime_type = mimeFilter;
   if (showTrashed) filters.trashed = 1;
@@ -77,8 +78,8 @@ export default function MediaLibraryPage() {
     for (const file of files) {
       try {
         await uploadMutation.mutateAsync({ file });
-      } catch (err: any) {
-        toast.error(err?.response?.data?.message || `Failed to upload ${file.name}`);
+      } catch (err) {
+        toast.error(getErrorMessage(err, `Failed to upload ${file.name}`));
       }
     }
     if (files.length) toast.success(`${files.length} file(s) uploaded`);
@@ -101,8 +102,8 @@ export default function MediaLibraryPage() {
       await updateMetadataMutation.mutateAsync({ uuid: editing.uuid, data: editForm });
       toast.success('Metadata saved');
       setEditing(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save metadata');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Failed to save metadata'));
     }
   };
 
@@ -112,8 +113,8 @@ export default function MediaLibraryPage() {
     try {
       await replaceMutation.mutateAsync({ uuid: replaceTarget, file });
       toast.success('File replaced');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to replace file');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Failed to replace file'));
     }
     setReplaceTarget(null);
     if (replaceInputRef.current) replaceInputRef.current.value = '';

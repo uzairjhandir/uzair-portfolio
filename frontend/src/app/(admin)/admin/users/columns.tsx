@@ -28,7 +28,7 @@ export const usersColumns: ColumnDef<UsersRecord>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status as any} />
+    cell: ({ row }) => <StatusBadge status={row.original.status} />
   },
   {
     accessorKey: "last_login",

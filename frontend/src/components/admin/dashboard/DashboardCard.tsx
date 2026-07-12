@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 export interface DashboardCardProps {
   title: string
   value: string | number
-  icon: React.ElementType<any>
+  icon: React.ElementType<{ className?: string }>
   change?: string
   trend?: "up" | "down" | "neutral"
   changeLabel?: string
@@ -27,10 +27,7 @@ export function DashboardCard({
           {title}
         </CardTitle>
         <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-          {(() => {
-            const IconToRender = Icon as any;
-            return <IconToRender className="w-4 h-4 text-primary" />;
-          })()}
+          <Icon className="w-4 h-4 text-primary" />
         </div>
       </CardHeader>
       <CardContent>

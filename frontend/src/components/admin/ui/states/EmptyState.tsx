@@ -5,7 +5,7 @@ interface EmptyStateProps {
   title?: string
   description?: string
   action?: React.ReactNode
-  icon?: React.ElementType<any>
+  icon?: React.ElementType<{ className?: string }>
 }
 
 export function EmptyState({ 
@@ -17,10 +17,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg border-dashed bg-muted/10">
       <div className="w-12 h-12 mb-4 rounded-full bg-muted flex items-center justify-center">
-        {(() => {
-          const IconToRender = Icon as any;
-          return <IconToRender className="w-6 h-6 text-muted-foreground" />;
-        })()}
+        <Icon className="w-6 h-6 text-muted-foreground" />
       </div>
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="text-sm text-muted-foreground mt-1 mb-6 max-w-sm">

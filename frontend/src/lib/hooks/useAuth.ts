@@ -2,6 +2,7 @@ import { useUserQuery } from '../query/auth/queries';
 import { useLoginMutation, useLogoutMutation } from '../query/auth/mutations';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { getErrorMessage } from '../utils';
 
 export const useAuth = () => {
   const router = useRouter();
@@ -16,8 +17,8 @@ export const useAuth = () => {
       await loginMutation.mutateAsync(credentials);
       toast.success('Logged in successfully');
       router.push('/admin/dashboard');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed');
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Login failed'));
     }
   };
 
@@ -26,7 +27,7 @@ export const useAuth = () => {
       await logoutMutation.mutateAsync();
       toast.success('Logged out successfully');
       router.push('/admin/login');
-    } catch (error) {
+    } catch {
       toast.error('Logout failed');
     }
   };

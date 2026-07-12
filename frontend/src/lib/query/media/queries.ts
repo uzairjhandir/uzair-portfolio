@@ -3,10 +3,17 @@ import { apiClient } from '@/lib/api/client';
 import { mediaKeys } from './keys';
 import { Media, MediaFolder } from './types';
 
-export const useMediaQuery = (filters?: Record<string, any>) => {
+interface MediaListMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export const useMediaQuery = (filters?: Record<string, unknown>) => {
   return useQuery({
     queryKey: mediaKeys.list(filters || {}),
-    queryFn: async (): Promise<{ data: Media[], meta: any }> => {
+    queryFn: async (): Promise<{ data: Media[], meta: MediaListMeta }> => {
       const response = await apiClient.get('/media', { params: filters });
       return response.data;
     },

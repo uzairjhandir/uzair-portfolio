@@ -20,7 +20,7 @@ export function createGenericService<T>(resourceKey: ResourceKey) {
   const endpoint = resourceDef.endpoint || `/${resourceDef.resource}`;
 
   return {
-    getList: async (filters?: Record<string, any>): Promise<PaginatedResponse<T>> => {
+    getList: async (filters?: Record<string, unknown>): Promise<PaginatedResponse<T>> => {
       const response = await apiClient.get(endpoint, { params: filters });
       return response.data;
     },
