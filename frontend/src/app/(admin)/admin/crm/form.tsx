@@ -1,168 +1,79 @@
-"use client"
+'use client';
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CrmFormValues, crmSchema } from "./validation"
-import { CrmRecord } from "./types"
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { ContactCreatePayload } from '@/lib/query/crm/mutations';
 
-interface CrmFormProps {
-  initialData?: CrmRecord
-  onSubmit: (data: Partial<CrmRecord>) => void
-  isSubmitting: boolean
-  mode: "create" | "edit" | "view" | "clone"
+interface ContactCreateFormProps {
+  onSubmit: (data: ContactCreatePayload) => void;
+  isSubmitting: boolean;
 }
 
-export function CrmForm({ initialData, onSubmit, isSubmitting, mode }: CrmFormProps) {
-  const form = useForm<CrmFormValues>({
-    resolver: zodResolver(crmSchema) as any,
-    defaultValues: initialData || {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-      source: "website",
-      status: "new",
-      priority: "medium",
-      notes: ""
-    },
-  })
+export function ContactCreateForm({ onSubmit, isSubmitting }: ContactCreateFormProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      first_name: firstName,
+      last_name: lastName || undefined,
+      email,
+      phone: phone || undefined,
+      company: company || undefined,
+      job_title: jobTitle || undefined,
+      message: message || undefined,
+      source: 'manual',
+    });
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Lead Name" disabled={mode === "view"} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="email@example.com" disabled={mode === "view"} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="subject"
-            render={({ field }: any) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Subject</FormLabel>
-                <FormControl>
-                  <Input placeholder="Inquiry Subject" disabled={mode === "view"} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }: any) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Message</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Original message..." className="h-24" disabled={mode === "view"} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select disabled={mode === "view"} onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="contacted">Contacted</SelectItem>
-                    <SelectItem value="qualified">Qualified</SelectItem>
-                    <SelectItem value="won">Won</SelectItem>
-                    <SelectItem value="lost">Lost</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="priority"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Priority</FormLabel>
-                <Select disabled={mode === "view"} onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }: any) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Internal Notes</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Add a note..." disabled={mode === "view"} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>First Name</Label>
+          <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
         </div>
-
-        {mode !== "view" && (
-          <div className="flex justify-end pt-4 border-t">
-            <Button type="submit" disabled={isSubmitting}>
-              {mode === "create" ? "Create Lead" : mode === "clone" ? "Clone Lead" : "Save Changes"}
-            </Button>
-          </div>
-        )}
-      </form>
-    </Form>
-  )
+        <div className="space-y-2">
+          <Label>Last Name</Label>
+          <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+        </div>
+        <div className="space-y-2 col-span-2">
+          <Label>Email</Label>
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </div>
+        <div className="space-y-2">
+          <Label>Phone</Label>
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Company</Label>
+          <Input value={company} onChange={(e) => setCompany(e.target.value)} />
+        </div>
+        <div className="space-y-2 col-span-2">
+          <Label>Job Title</Label>
+          <Input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
+        </div>
+        <div className="space-y-2 col-span-2">
+          <Label>Message / Notes</Label>
+          <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} />
+        </div>
+      </div>
+      <div className="flex justify-end pt-4 border-t">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          Create Contact
+        </Button>
+      </div>
+    </form>
+  );
 }

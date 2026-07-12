@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCreateLeadMutation } from "@/lib/query/crm/mutations";
+import { useSubmitContactFormMutation } from "@/lib/query/crm/mutations";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,7 +43,7 @@ export function Contact() {
     resolver: zodResolver(formSchema),
   });
 
-  const { mutateAsync: createLead } = useCreateLeadMutation();
+  const { mutateAsync: submitContactForm } = useSubmitContactFormMutation();
 
   const onSubmit = async (data: FormData) => {
     // Check submission time to prevent instant bot submissions (min 3 seconds)
@@ -57,7 +57,7 @@ export function Contact() {
     setSubmitStatus("idle");
     
     try {
-      await createLead(data);
+      await submitContactForm(data);
       setSubmitStatus("success");
       reset();
     } catch {

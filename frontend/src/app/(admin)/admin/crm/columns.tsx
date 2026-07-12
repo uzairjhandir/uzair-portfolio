@@ -1,45 +1,59 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { CrmRecord } from "./types";
+import { CrmContact } from "@/lib/query/crm/types";
 import { StatusBadge } from "@/components/admin/ui/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 
-export const crmColumns: ColumnDef<CrmRecord>[] = [
+export const crmColumns: ColumnDef<CrmContact>[] = [
   {
-    accessorKey: "lead",
-    header: "Lead",
+    accessorKey: "full_name",
+    header: "Name",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium">{row.original.name}</p>
+        <p className="font-medium">{row.original.full_name}</p>
         <p className="text-xs text-muted-foreground">{row.original.email}</p>
       </div>
-    )
+    ),
   },
   {
-    accessorKey: "subject",
-    header: "Subject",
-    cell: ({ row }) => <span className="text-sm truncate max-w-[200px] block">{row.original.subject}</span>
+    accessorKey: "company",
+    header: "Company",
+    cell: ({ row }) => (
+      <span className="text-sm">{row.original.company || '—'}</span>
+    ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status as any} />
+    cell: ({ row }) => row.original.status ? <StatusBadge status={row.original.status} /> : <span className="text-sm text-muted-foreground">—</span>,
   },
   {
     accessorKey: "priority",
     header: "Priority",
-    cell: ({ row }) => {
-      const p = row.original.priority;
-      const color = p === "high" ? "destructive" : p === "medium" ? "default" : "secondary";
-      return <Badge variant={color as any}>{p}</Badge>;
-    }
+    cell: ({ row }) => row.original.priority ? (
+      <Badge variant="outline" className="capitalize">{row.original.priority}</Badge>
+    ) : <span className="text-sm text-muted-foreground">—</span>,
+  },
+  {
+    accessorKey: "assigned_to",
+    header: "Assigned To",
+    cell: ({ row }) => (
+      <span className="text-sm">{row.original.assigned_to?.name || 'Unassigned'}</span>
+    ),
+  },
+  {
+    accessorKey: "activities_count",
+    header: "Activities",
+    cell: ({ row }) => (
+      <span className="text-sm">{row.original.activities_count}</span>
+    ),
   },
   {
     accessorKey: "created_at",
-    header: "Date",
+    header: "Created",
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
-        {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : "—"}
+        {new Date(row.original.created_at).toLocaleDateString()}
       </span>
-    )
-  }
+    ),
+  },
 ];

@@ -60,10 +60,28 @@ class ContactController extends Controller
         $data = $request->validate([
             'status'      => 'nullable|string',
             'priority'    => 'nullable|in:low,normal,high,urgent',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'nullable|string',
             'company'     => 'nullable|string',
             'job_title'   => 'nullable|string',
+            'first_name'  => 'nullable|string|max:100',
+            'last_name'   => 'nullable|string|max:100',
+            'email'       => 'nullable|email|unique:crm_contacts,email,' . $contact->id,
+            'phone'       => 'nullable|string',
+            'website'     => 'nullable|string',
+            'message'     => 'nullable|string',
         ]);
+
+        // Every other relation in this API is UUID-based, but assigned_to is a
+        // raw integer FK — GET /users returns the user's UUID as "id" (see
+        // UserResource), so resolve it here the same way Blog/CaseStudy/
+        // Downloads resolve their UUID-based media/portfolio references.
+        if (array_key_exists('assigned_to', $data) && $data['assigned_to']) {
+            $resolvedId = \App\Models\User::where('uuid', $data['assigned_to'])->value('id');
+            if (!$resolvedId) {
+                return response()->json(['message' => 'The selected assigned to is invalid.', 'errors' => ['assigned_to' => ['The selected assigned to is invalid.']]], 422);
+            }
+            $data['assigned_to'] = $resolvedId;
+        }
 
         // Log assignment changes to activity timeline
         if (isset($data['assigned_to']) && $data['assigned_to'] !== $contact->assigned_to) {
@@ -75,7 +93,7 @@ class ContactController extends Controller
 
         $data['updated_by'] = $request->user()->id;
         $contact->update($data);
-        return new ContactResource($contact);
+        return new ContactResource($contact->fresh(['assignedTo', 'pipelineStage']));
     }
 
     public function destroy(string $uuid)

@@ -19,12 +19,15 @@ class CrmPipelineStage extends Model
     protected $fillable = [
         'name', 'color', 'icon', 'sort_order',
         'is_won', 'is_lost', 'is_default',
+        'probability', 'expected_value',
     ];
 
     protected $casts = [
-        'is_won'     => 'boolean',
-        'is_lost'    => 'boolean',
-        'is_default' => 'boolean',
+        'is_won'         => 'boolean',
+        'is_lost'        => 'boolean',
+        'is_default'     => 'boolean',
+        'probability'    => 'integer',
+        'expected_value' => 'decimal:2',
     ];
 
     public function contacts()
