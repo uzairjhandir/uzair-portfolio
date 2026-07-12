@@ -37,7 +37,7 @@ export const blogColumns: ColumnDef<BlogPost>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status as any} />,
+    cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
   {
     accessorKey: "publish_at",

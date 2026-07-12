@@ -59,9 +59,9 @@ export function FileUpload({ value, onChange, disabled, accept = "*/*" }: FileUp
             accept={accept}
             onChange={async (e) => {
               if (e.target.files?.[0]) {
-                const response = await uploadMutation.mutateAsync(e.target.files[0]);
-                if (response?.data?.url) {
-                  onChange(response.data.url);
+                const response = await uploadMutation.mutateAsync({ file: e.target.files[0] });
+                if (response?.data?.original_url) {
+                  onChange(response.data.original_url);
                 }
               }
             }}

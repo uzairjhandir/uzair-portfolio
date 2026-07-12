@@ -38,8 +38,7 @@ export function TaxonomyPicker({ taxonomySlug, label, value, onChange }: Taxonom
     if (!newTermName.trim() || !taxonomy) return;
     const slug = newTermName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     try {
-      const result = await createTerm.mutateAsync({ taxonomyUuid: taxonomy.uuid, name: newTermName.trim(), slug });
-      const term = (result as any);
+      const term = await createTerm.mutateAsync({ taxonomyUuid: taxonomy.uuid, name: newTermName.trim(), slug });
       onChange([...value, { uuid: term.uuid, name: term.name, slug: term.slug }]);
       setNewTermName('');
     } catch {

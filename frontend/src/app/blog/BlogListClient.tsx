@@ -3,7 +3,7 @@
 import { useBlogListQuery } from "@/lib/query/blog/queries";
 import { FadeIn } from "@/components/animations/FadeIn";
 import Link from "next/link";
-import { ArrowRight, Calendar, Clock } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 import { BlogPost } from "@/lib/query/blog/types";
 
 export function BlogListClient() {

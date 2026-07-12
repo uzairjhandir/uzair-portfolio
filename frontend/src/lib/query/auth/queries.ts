@@ -8,8 +8,11 @@ export const useUserQuery = () => {
     queryKey: authKeys.user(),
     queryFn: async (): Promise<User> => {
       const response = await apiClient.get('/auth/me');
-      return response.data.data; // Standard Laravel API resource response
+      const { user, roles, permissions } = response.data.data;
+      return { ...user, roles, permissions };
     },
     retry: false, // Don't retry if unauthenticated
+    refetchOnMount: false, // Prevents infinite loop when children mount
+    refetchOnWindowFocus: false,
   });
 };

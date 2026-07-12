@@ -12,7 +12,7 @@ async function getPost(slug: string): Promise<BlogPost | null> {
   try {
     const res = await axios.get(`${API_URL}/blogs/${slug}`);
     return res.data.data;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -21,7 +21,7 @@ async function getAllPosts(): Promise<BlogPost[]> {
   try {
     const res = await axios.get(`${API_URL}/blogs`);
     return res.data.data || [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }

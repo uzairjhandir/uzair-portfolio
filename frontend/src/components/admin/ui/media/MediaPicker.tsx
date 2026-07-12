@@ -6,11 +6,9 @@ import {
   UploadCloud, 
   Search, 
   Folder, 
-  Grid, 
-  List, 
-  X,
+  Grid,
+  List,
   FileText,
-  Video
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +23,7 @@ import {
 
 import { useUploadMediaMutation, useDeleteMediaMutation } from "@/lib/query/media/mutations";
 import { useMediaQuery as queryMediaQuery } from "@/lib/query/media/queries";
+import { Media } from "@/lib/query/media/types";
 
 const mockFolders = [
   { id: "1", name: "Images" },
@@ -42,7 +41,7 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
   const [view, setView] = React.useState<"grid" | "list">("grid")
   const [search, setSearch] = React.useState("")
   const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null)
-  const [selectedMediaId, setSelectedMediaId] = React.useState<string | number | null>(null)
+  const [selectedMediaId, setSelectedMediaId] = React.useState<string | null>(null)
   const [isDragging, setIsDragging] = React.useState(false)
 
   const { data: mediaData, isLoading } = queryMediaQuery({ search });
@@ -55,9 +54,9 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
 
   const handleSelect = () => {
     if (selectedMediaId) {
-      const media = mediaList.find((m: any) => m.id === selectedMediaId)
+      const media = mediaList.find((m: Media) => m.uuid === selectedMediaId)
       if (media && onChange) {
-        onChange(media.url)
+        onChange(media.original_url)
       }
       setIsOpen(false)
     }
@@ -78,14 +77,14 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      await uploadMutation.mutateAsync(file);
+      await uploadMutation.mutateAsync({ file });
     }
   }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      await uploadMutation.mutateAsync(file);
+      await uploadMutation.mutateAsync({ file });
     }
   }
 
@@ -193,17 +192,17 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
                 <div className="flex items-center justify-center h-full">Loading media...</div>
               ) : view === "grid" ? (
                 <div className="grid grid-cols-4 lg:grid-cols-5 gap-4">
-                  {mediaList.map((media: any) => (
+                  {mediaList.map((media: Media) => (
                     <div 
-                      key={media.id}
-                      onClick={() => setSelectedMediaId(media.id)}
+                      key={media.uuid}
+                      onClick={() => setSelectedMediaId(media.uuid)}
                       className={cn(
                         "group relative aspect-square rounded-lg border overflow-hidden cursor-pointer hover:border-primary/50 transition-colors",
-                        selectedMediaId === media.id ? "border-primary ring-2 ring-primary/20" : ""
+                        selectedMediaId === media.uuid ? "border-primary ring-2 ring-primary/20" : ""
                       )}
                     >
                       {media.mime_type?.startsWith("image/") ? (
-                        <img src={media.url} alt={media.file_name} className="w-full h-full object-cover" />
+                        <img src={media.original_url} alt={media.file_name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
                           <FileText className="w-8 h-8 text-muted-foreground" />
@@ -217,17 +216,17 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {mediaList.map((media: any) => (
+                  {mediaList.map((media: Media) => (
                     <div 
-                      key={media.id}
-                      onClick={() => setSelectedMediaId(media.id)}
+                      key={media.uuid}
+                      onClick={() => setSelectedMediaId(media.uuid)}
                       className={cn(
                         "flex items-center gap-4 p-3 rounded-lg border cursor-pointer hover:border-primary/50",
-                        selectedMediaId === media.id ? "border-primary bg-primary/5" : "bg-card"
+                        selectedMediaId === media.uuid ? "border-primary bg-primary/5" : "bg-card"
                       )}
                     >
                       {media.mime_type?.startsWith("image/") ? (
-                        <img src={media.url} alt={media.file_name} className="w-10 h-10 object-cover rounded" />
+                        <img src={media.original_url} alt={media.file_name} className="w-10 h-10 object-cover rounded" />
                       ) : (
                         <FileText className="w-10 h-10 text-muted-foreground" />
                       )}
@@ -247,13 +246,13 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
             <div className="w-72 border-l bg-muted/10 p-4 flex flex-col">
               <h3 className="font-semibold mb-4">Media Details</h3>
               {(() => {
-                const media = mediaList.find((m: any) => m.id === selectedMediaId)
+                const media = mediaList.find((m: Media) => m.uuid === selectedMediaId)
                 if (!media) return null
                 return (
                   <div className="space-y-4">
                     <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
                       {media.mime_type?.startsWith("image/") ? (
-                        <img src={media.url} alt={media.file_name} className="w-full h-full object-contain" />
+                        <img src={media.original_url} alt={media.file_name} className="w-full h-full object-contain" />
                       ) : (
                         <FileText className="w-12 h-12 text-muted-foreground" />
                       )}
@@ -267,7 +266,7 @@ export function MediaPicker({ value, onChange, trigger }: MediaPickerProps) {
                         Insert Media
                       </Button>
                       <Button variant="outline" className="w-full text-destructive hover:text-destructive" onClick={async () => {
-                        await deleteMutation.mutateAsync(media.id);
+                        await deleteMutation.mutateAsync(media.uuid);
                         setSelectedMediaId(null);
                       }} disabled={deleteMutation.isPending}>
                         {deleteMutation.isPending ? "Deleting..." : "Delete Permanently"}

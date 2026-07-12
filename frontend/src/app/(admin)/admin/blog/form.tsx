@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,7 @@ import { MediaPickerField, MediaRefValue } from '@/components/admin/media/MediaP
 import { TaxonomyPicker } from '@/components/admin/taxonomy/TaxonomyPicker';
 import { BlogPost, TaxonomyTermRef } from '@/lib/query/blog/types';
 import { BlogPayload } from '@/lib/query/blog/mutations';
+import { STATUS_LABELS, allowedNextStatuses } from '@/lib/query/blog/workflow';
 
 interface BlogFormProps {
   initialData?: BlogPost;
@@ -47,9 +48,10 @@ export function BlogForm({ initialData, onSubmit, isSubmitting, mode }: BlogForm
   const [canonicalUrl, setCanonicalUrl] = useState(initialData?.seo?.canonical_url || '');
   const [publishAt, setPublishAt] = useState(initialData?.publish_at ? initialData.publish_at.slice(0, 16) : '');
 
-  useEffect(() => {
-    if (!slugTouched) setSlug(slugify(title));
-  }, [title, slugTouched]);
+  const handleTitleChange = (value: string) => {
+    setTitle(value);
+    if (!slugTouched) setSlug(slugify(value));
+  };
 
   const readOnly = mode === 'view';
 
@@ -82,7 +84,7 @@ export function BlogForm({ initialData, onSubmit, isSubmitting, mode }: BlogForm
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 col-span-2">
               <Label>Title</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} disabled={readOnly} required />
+              <Input value={title} onChange={(e) => handleTitleChange(e.target.value)} disabled={readOnly} required />
             </div>
             <div className="space-y-2">
               <Label>Slug</Label>
@@ -95,17 +97,19 @@ export function BlogForm({ initialData, onSubmit, isSubmitting, mode }: BlogForm
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as BlogPost['status'])} disabled={readOnly}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="in_review">In Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
+              {mode === 'create' ? (
+                <Input value={STATUS_LABELS.draft} disabled />
+              ) : (
+                <Select value={status} onValueChange={(v) => setStatus(v as BlogPost['status'])} disabled={readOnly}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={status}>{STATUS_LABELS[status]} (current)</SelectItem>
+                    {allowedNextStatuses(status).map((next) => (
+                      <SelectItem key={next} value={next}>{STATUS_LABELS[next]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 

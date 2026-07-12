@@ -34,6 +34,7 @@ import {
   BlogPayload,
 } from "@/lib/query/blog/mutations";
 import { BlogPost, BlogFilters } from "@/lib/query/blog/types";
+import { STATUS_LABELS, allowedNextStatuses } from "@/lib/query/blog/workflow";
 
 import { blogColumns } from "./columns";
 import { BlogForm } from "./form";
@@ -97,12 +98,11 @@ export default function BlogPage() {
     }
   };
 
-  const handlePublishToggle = (row: BlogPost) => {
-    const isPublished = row.status === "published";
+  const handleStatusTransition = (row: BlogPost, next: BlogPost["status"]) => {
     updateMutation.mutate(
-      { uuid: row.uuid, data: { status: isPublished ? "draft" : "published" } },
+      { uuid: row.uuid, data: { status: next } },
       {
-        onSuccess: () => toast.success(isPublished ? "Unpublished" : "Published"),
+        onSuccess: () => toast.success(`Moved to ${STATUS_LABELS[next]}`),
         onError: () => toast.error("Action failed"),
       }
     );
@@ -115,14 +115,22 @@ export default function BlogPage() {
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handlePublishToggle(row.original)}
-            disabled={updateMutation.isPending}
-          >
-            {row.original.status === "published" ? "Unpublish" : "Publish"}
-          </Button>
+          {allowedNextStatuses(row.original.status).length > 0 && (
+            <Select
+              value=""
+              onValueChange={(v) => handleStatusTransition(row.original, v as BlogPost["status"])}
+              disabled={updateMutation.isPending}
+            >
+              <SelectTrigger className="h-8 w-[140px]">
+                <SelectValue placeholder="Move to..." />
+              </SelectTrigger>
+              <SelectContent>
+                {allowedNextStatuses(row.original.status).map((next) => (
+                  <SelectItem key={next} value={next}>{STATUS_LABELS[next]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <DataTableRowActions
             row={row.original}
             onEdit={(r) => {

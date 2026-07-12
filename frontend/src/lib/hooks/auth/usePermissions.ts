@@ -12,11 +12,9 @@ export function usePermissions() {
     if (!user) return false;
 
     // Super Admin override
-    if (user.role === 'admin' || user.role === 'super_admin') return true;
+    if (user.roles?.includes('Super Admin')) return true;
 
-    // Check against specific permissions array if the backend provides it
-    // Example: return user.permissions?.includes(permission);
-    return false;
+    return user.permissions?.includes(permission) ?? false;
   };
 
   return { hasPermission };
