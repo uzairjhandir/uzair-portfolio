@@ -16,13 +16,3 @@ class DownloadRequested
         public DownloadToken $token
     ) {}
 }
-
-class DownloadCompleted
-{
-    use Dispatchable, SerializesModels;
-
-    public function __construct(
-        public Download $download,
-        public DownloadToken $token
-    ) {}
-}

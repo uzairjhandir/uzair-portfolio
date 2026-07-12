@@ -68,7 +68,7 @@ class PortfolioController extends AbstractContentController
 
     public function store(Request $request)
     {
-        $item = Portfolio::create($request->except(['seo', 'categories', 'technologies', 'gallery']));
+        $item = Portfolio::create($request->except(['seo', 'categories', 'technologies', 'gallery', 'featured_image_id']));
         $this->syncRelations($item, $request);
         event(new \App\Events\ContentCreated($item));
         return new PortfolioResource($item->fresh(self::EAGER));
@@ -77,7 +77,7 @@ class PortfolioController extends AbstractContentController
     public function update(Request $request, string $uuid)
     {
         $item = Portfolio::where('uuid', $uuid)->firstOrFail();
-        $item->update($request->except(['seo', 'categories', 'technologies', 'gallery']));
+        $item->update($request->except(['seo', 'categories', 'technologies', 'gallery', 'featured_image_id']));
         $this->syncRelations($item, $request);
         event(new \App\Events\ContentUpdated($item));
         return new PortfolioResource($item->fresh(self::EAGER));
@@ -96,6 +96,10 @@ class PortfolioController extends AbstractContentController
         }
         if ($request->has('gallery')) {
             $item->syncMedia('gallery', $request->input('gallery', []));
+        }
+        if ($request->has('featured_image_id')) {
+            $uuid = $request->input('featured_image_id');
+            $item->syncMedia('featured', $uuid ? [$uuid] : []);
         }
     }
 

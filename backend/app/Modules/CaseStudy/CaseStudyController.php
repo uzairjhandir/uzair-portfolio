@@ -65,7 +65,7 @@ class CaseStudyController extends AbstractContentController
 
     public function store(Request $request)
     {
-        $data = $request->except(['seo', 'categories', 'technologies', 'gallery', 'portfolio_uuid']);
+        $data = $request->except(['seo', 'categories', 'technologies', 'gallery', 'portfolio_uuid', 'featured_image_id']);
         $data['portfolio_id'] = $this->resolvePortfolioId($request);
         $item = CaseStudy::create($data);
         $this->syncRelations($item, $request);
@@ -76,7 +76,7 @@ class CaseStudyController extends AbstractContentController
     public function update(Request $request, string $uuid)
     {
         $item = CaseStudy::where('uuid', $uuid)->firstOrFail();
-        $data = $request->except(['seo', 'categories', 'technologies', 'gallery', 'portfolio_uuid']);
+        $data = $request->except(['seo', 'categories', 'technologies', 'gallery', 'portfolio_uuid', 'featured_image_id']);
         if ($request->has('portfolio_uuid')) {
             $data['portfolio_id'] = $this->resolvePortfolioId($request);
         }
@@ -114,6 +114,10 @@ class CaseStudyController extends AbstractContentController
         }
         if ($request->has('gallery')) {
             $item->syncMedia('gallery', $request->input('gallery', []));
+        }
+        if ($request->has('featured_image_id')) {
+            $uuid = $request->input('featured_image_id');
+            $item->syncMedia('featured', $uuid ? [$uuid] : []);
         }
     }
 
