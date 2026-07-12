@@ -49,7 +49,21 @@ class PageBuilderController extends Controller
     public function render(string $uuid)
     {
         $page = Page::where('uuid', $uuid)->with('pageBlocks.block.type')->firstOrFail();
-        
+
+        return new PageRenderResource($page);
+    }
+
+    /**
+     * GET /public/pages/{slugOrUuid}/render — published-only, no auth.
+     * Matches by slug (public URLs like "home") or uuid.
+     */
+    public function publicRender(string $slugOrUuid)
+    {
+        $page = Page::where('status', 'published')
+            ->where(fn($q) => $q->where('slug', $slugOrUuid)->orWhere('uuid', $slugOrUuid))
+            ->with('pageBlocks.block.type')
+            ->firstOrFail();
+
         return new PageRenderResource($page);
     }
 }

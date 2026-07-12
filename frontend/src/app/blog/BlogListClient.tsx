@@ -1,13 +1,13 @@
 "use client";
 
-import { useBlogListQuery } from "@/lib/query/blog/queries";
+import { usePublicBlogListQuery } from "@/lib/query/blog/queries";
 import { FadeIn } from "@/components/animations/FadeIn";
 import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
 import { BlogPost } from "@/lib/query/blog/types";
 
 export function BlogListClient() {
-  const { data: response, isLoading } = useBlogListQuery();
+  const { data: response, isLoading } = usePublicBlogListQuery();
   const blogData = response?.data || [];
 
   if (isLoading) {

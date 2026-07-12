@@ -1,26 +1,14 @@
 "use client";
 
-import { usePortfolioListQuery } from "@/lib/query/portfolio/queries";
+import { usePublicCaseStudyListQuery } from "@/lib/query/case-studies/queries";
 import { FadeIn } from "@/components/animations/FadeIn";
 import Link from "next/link";
-import { ArrowRight, Activity, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { TiltCard } from "@/components/ui/TiltCard";
-import { PortfolioProject } from "@/lib/query/portfolio/types";
-
-/**
- * category_id/performance/overview are not part of the real Portfolio API —
- * this card was built against placeholder data. Kept optional so the display
- * degrades gracefully instead of being redesigned here (out of Phase 5 scope).
- */
-type DisplayPortfolioProject = PortfolioProject & {
-  category_id?: string;
-  performance?: { lighthouse?: number; loadTime?: string };
-  overview?: string;
-  description?: string;
-};
+import { CaseStudy } from "@/lib/query/case-studies/types";
 
 export function CaseStudiesClient() {
-  const { data: response, isLoading } = usePortfolioListQuery();
+  const { data: response, isLoading, isError } = usePublicCaseStudyListQuery();
   const caseStudiesData = response?.data || [];
 
   return (
@@ -46,70 +34,55 @@ export function CaseStudiesClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {isLoading ? (
             <div className="col-span-2 text-center text-muted-foreground py-10 animate-pulse">Loading case studies...</div>
+          ) : isError ? (
+            <div className="col-span-2 text-center text-red-400 py-10">Failed to load case studies. Please try again later.</div>
           ) : caseStudiesData.length === 0 ? (
-            <div className="col-span-2 text-center text-muted-foreground py-10">No case studies found.</div>
-          ) : caseStudiesData.map((project: DisplayPortfolioProject, index: number) => (
-            <FadeIn key={project.slug} delay={index * 0.1}>
+            <div className="col-span-2 text-center text-muted-foreground py-10">No case studies published yet.</div>
+          ) : caseStudiesData.map((study: CaseStudy, index: number) => (
+            <FadeIn key={study.slug} delay={index * 0.1}>
               <TiltCard className="portfolio-card group p-0 overflow-hidden bg-[#0A0F1A] border border-white/10 rounded-2xl flex flex-col h-full hover:border-white/20 transition-colors">
-                
-                {/* Image Section */}
                 <div className="relative h-72 w-full overflow-hidden shrink-0">
-                  <div 
+                  <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
-                    style={{ backgroundImage: `url(${project.featured_image?.original_url || 'https://placehold.co/800x600'})` }}
+                    style={{ backgroundImage: `url(${study.featured_image?.original_url || 'https://placehold.co/800x600'})` }}
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1A] via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500"></div>
                 </div>
 
-                {/* Content Section */}
                 <div className="p-8 flex flex-col flex-grow relative -mt-8 bg-gradient-to-t from-[#0A0F1A] via-[#0A0F1A] to-transparent">
-                  
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-accent font-mono text-xs font-bold tracking-widest uppercase bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
-                      {project.category_id || 'Project'}
-                    </span>
-                    <div className="flex gap-2 relative z-20 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] delay-100">
-                      {project.performance?.lighthouse && (
-                        <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded text-xs font-medium text-white shadow-lg">
-                          <Activity size={14} className="text-accent" />
-                          <span className="hidden lg:inline">Lighthouse:</span>
-                          <span>{project.performance.lighthouse}</span>
-                        </div>
-                      )}
-                      {project.performance?.loadTime && (
-                        <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded text-xs font-medium text-white shadow-lg">
-                          <Clock size={14} className="text-accent" />
-                          <span className="hidden lg:inline">Load:</span>
-                          <span>{project.performance.loadTime}</span>
-                        </div>
-                      )}
+                  {study.categories.length > 0 && (
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-accent font-mono text-xs font-bold tracking-widest uppercase bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
+                        {study.categories[0].name}
+                      </span>
                     </div>
-                  </div>
+                  )}
 
                   <h3 className="text-2xl font-heading font-bold text-white mb-3 group-hover:text-accent transition-colors">
-                    {project.title}
+                    {study.title}
                   </h3>
-                  
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-grow line-clamp-3">
-                    {project.description || project.overview}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-8">
-                    {(project.technologies || []).slice(0, 5).map((tech: { uuid: string; name: string }) => (
-                      <span key={tech.uuid} className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-300">
-                        {tech.name}
-                      </span>
-                    ))}
-                    {(project.technologies || []).length > 5 && (
-                      <span className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-500">
-                        +{(project.technologies || []).length - 5}
-                      </span>
-                    )}
-                  </div>
 
-                  {/* Actions */}
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-grow line-clamp-3">
+                    {study.excerpt}
+                  </p>
+
+                  {study.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {study.technologies.slice(0, 5).map((tech) => (
+                        <span key={tech.uuid} className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-300">
+                          {tech.name}
+                        </span>
+                      ))}
+                      {study.technologies.length > 5 && (
+                        <span className="px-2.5 py-1 text-xs font-medium rounded bg-white/5 border border-white/10 text-gray-500">
+                          +{study.technologies.length - 5}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between border-t border-white/10 pt-6 mt-auto">
-                    <Link href={`/case-studies/${project.slug}`} className="inline-flex items-center space-x-2 text-white hover:text-accent font-medium group/link before:absolute before:inset-0 before:z-10 w-full translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150">
+                    <Link href={`/case-studies/${study.slug}`} className="inline-flex items-center space-x-2 text-white hover:text-accent font-medium group/link before:absolute before:inset-0 before:z-10 w-full translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150">
                       <span>Read Case Study</span>
                       <ArrowRight size={18} className="transform group-hover/link:translate-x-2 transition-transform" />
                     </Link>

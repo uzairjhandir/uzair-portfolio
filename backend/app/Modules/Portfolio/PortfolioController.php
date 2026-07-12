@@ -103,6 +103,39 @@ class PortfolioController extends AbstractContentController
         }
     }
 
+    /** GET /public/portfolios — published-only, no auth. */
+    public function publicIndex(Request $request)
+    {
+        $query = Portfolio::with(self::EAGER)->where('status', 'published');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%")
+                  ->orWhere('client_name', 'like', "%{$search}%");
+            });
+        }
+
+        $sortBy = in_array($request->query('sort_by'), ['title', 'created_at', 'completion_date', 'updated_at'])
+            ? $request->query('sort_by')
+            : 'completion_date';
+        $sortDir = $request->query('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortDir);
+
+        $items = $query->paginate((int) $request->query('per_page', 15));
+        return PortfolioResource::collection($items);
+    }
+
+    /** GET /public/portfolios/{slugOrUuid} — published-only, no auth. Matches by slug or uuid. */
+    public function publicShow(string $slugOrUuid)
+    {
+        $item = Portfolio::with(self::EAGER)
+            ->where('status', 'published')
+            ->where(fn($q) => $q->where('slug', $slugOrUuid)->orWhere('uuid', $slugOrUuid))
+            ->firstOrFail();
+        return new PortfolioResource($item);
+    }
+
     /** GET /portfolios/featured */
     public function featured(): \Illuminate\Http\JsonResponse
     {

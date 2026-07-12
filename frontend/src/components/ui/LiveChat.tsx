@@ -3,11 +3,19 @@
 import { useEffect } from "react";
 import { useLiveChatConfigQuery } from "@/lib/query/livechat/queries";
 
+declare global {
+  interface Window {
+    $crisp?: unknown[];
+    CRISP_WEBSITE_ID?: string;
+  }
+}
+
 export function LiveChat() {
-  const { data: config } = useLiveChatConfigQuery();
+  const { data: response } = useLiveChatConfigQuery();
+  const config = response?.config;
 
   useEffect(() => {
-    if (!config?.enabled) return;
+    if (!response?.enabled || !config) return;
 
     if (config.provider === 'tawk.to' && config.propertyId && config.widgetId) {
       // Initialize tawk.to
@@ -22,15 +30,15 @@ export function LiveChat() {
 
     if (config.provider === 'crisp' && config.websiteId) {
       // Initialize crisp
-      (window as any).$crisp = [];
-      (window as any).CRISP_WEBSITE_ID = config.websiteId;
+      window.$crisp = [];
+      window.CRISP_WEBSITE_ID = config.websiteId;
       const d = document;
       const s = d.createElement("script");
       s.src = "https://client.crisp.chat/l.js";
       s.async = true;
       d.getElementsByTagName("head")[0].appendChild(s);
     }
-  }, [config]);
+  }, [response, config]);
 
   return null;
 }

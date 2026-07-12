@@ -23,3 +23,25 @@ export const useDownloadDetailQuery = (uuid: string) => {
     enabled: !!uuid,
   });
 };
+
+/** Public, unauthenticated (published-only), for the public /downloads pages — never used by admin. */
+export const usePublicDownloadListQuery = (filters: DownloadFilters = {}) => {
+  return useQuery({
+    queryKey: [...downloadKeys.list(filters), 'public'],
+    queryFn: async (): Promise<DownloadListResponse> => {
+      const response = await apiClient.get('/public/downloads', { params: filters });
+      return response.data;
+    },
+  });
+};
+
+export const usePublicDownloadDetailQuery = (slugOrUuid: string) => {
+  return useQuery({
+    queryKey: [...downloadKeys.detail(slugOrUuid), 'public'],
+    queryFn: async (): Promise<DownloadItem> => {
+      const response = await apiClient.get(`/public/downloads/${slugOrUuid}`);
+      return response.data.data;
+    },
+    enabled: !!slugOrUuid,
+  });
+};

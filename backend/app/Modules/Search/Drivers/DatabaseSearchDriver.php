@@ -112,35 +112,70 @@ class DatabaseSearchDriver extends AbstractSearchDriver
         $start        = microtime(true);
         $rawQuery     = $query->getQuery();
         $booleanQuery = $this->prepareBooleanQuery($rawQuery);
+        $isSqlite     = DB::connection()->getDriverName() === 'sqlite';
 
-        // Weighted score expression using per-field FULLTEXT indexes
-        $scoreExpr = <<<SQL
-            (
-                MATCH(title)    AGAINST(? IN BOOLEAN MODE) * :w_title    +
-                MATCH(keywords) AGAINST(? IN BOOLEAN MODE) * :w_keywords +
-                MATCH(summary)  AGAINST(? IN BOOLEAN MODE) * :w_summary  +
-                MATCH(content)  AGAINST(? IN BOOLEAN MODE) * :w_content  +
-                boost
-            )
-        SQL;
+        if ($isSqlite) {
+            // MySQL FULLTEXT (MATCH/AGAINST) has no SQLite equivalent — used only
+            // for local dev/tests, where the DB connection is sqlite. Production
+            // runs MySQL and keeps the FULLTEXT-scored path below unchanged.
+            $likeTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], trim($rawQuery)) . '%';
 
-        $q = DB::table('search_index')
-            ->select('*')
-            ->selectRaw("({$scoreExpr}) AS final_score", [
-                $booleanQuery, $booleanQuery, $booleanQuery, $booleanQuery,
-                'w_title'    => self::WEIGHT_TITLE,
-                'w_keywords' => self::WEIGHT_KEYWORDS,
-                'w_summary'  => self::WEIGHT_SUMMARY,
-                'w_content'  => self::WEIGHT_CONTENT,
-            ])
-            ->where(function ($q) use ($booleanQuery) {
-                // At least one field must match — avoids zero-score ghost results
-                $q->whereRaw('MATCH(title)    AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
-                  ->orWhereRaw('MATCH(keywords) AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
-                  ->orWhereRaw('MATCH(summary)  AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
-                  ->orWhereRaw('MATCH(content)  AGAINST(? IN BOOLEAN MODE)', [$booleanQuery]);
-            })
-            ->where('index_version', $query->getIndexVersion());
+            $scoreExpr = <<<SQL
+                (
+                    (CASE WHEN title    LIKE ? ESCAPE '\' THEN :w_title    ELSE 0 END) +
+                    (CASE WHEN keywords LIKE ? ESCAPE '\' THEN :w_keywords ELSE 0 END) +
+                    (CASE WHEN summary  LIKE ? ESCAPE '\' THEN :w_summary  ELSE 0 END) +
+                    (CASE WHEN content  LIKE ? ESCAPE '\' THEN :w_content  ELSE 0 END) +
+                    boost
+                )
+            SQL;
+
+            $q = DB::table('search_index')
+                ->select('*')
+                ->selectRaw("({$scoreExpr}) AS final_score", [
+                    $likeTerm, $likeTerm, $likeTerm, $likeTerm,
+                    'w_title'    => self::WEIGHT_TITLE,
+                    'w_keywords' => self::WEIGHT_KEYWORDS,
+                    'w_summary'  => self::WEIGHT_SUMMARY,
+                    'w_content'  => self::WEIGHT_CONTENT,
+                ])
+                ->where(function ($q) use ($likeTerm) {
+                    $q->where('title', 'like', $likeTerm)
+                      ->orWhere('keywords', 'like', $likeTerm)
+                      ->orWhere('summary', 'like', $likeTerm)
+                      ->orWhere('content', 'like', $likeTerm);
+                });
+        } else {
+            // Weighted score expression using per-field FULLTEXT indexes
+            $scoreExpr = <<<SQL
+                (
+                    MATCH(title)    AGAINST(? IN BOOLEAN MODE) * :w_title    +
+                    MATCH(keywords) AGAINST(? IN BOOLEAN MODE) * :w_keywords +
+                    MATCH(summary)  AGAINST(? IN BOOLEAN MODE) * :w_summary  +
+                    MATCH(content)  AGAINST(? IN BOOLEAN MODE) * :w_content  +
+                    boost
+                )
+            SQL;
+
+            $q = DB::table('search_index')
+                ->select('*')
+                ->selectRaw("({$scoreExpr}) AS final_score", [
+                    $booleanQuery, $booleanQuery, $booleanQuery, $booleanQuery,
+                    'w_title'    => self::WEIGHT_TITLE,
+                    'w_keywords' => self::WEIGHT_KEYWORDS,
+                    'w_summary'  => self::WEIGHT_SUMMARY,
+                    'w_content'  => self::WEIGHT_CONTENT,
+                ])
+                ->where(function ($q) use ($booleanQuery) {
+                    // At least one field must match — avoids zero-score ghost results
+                    $q->whereRaw('MATCH(title)    AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
+                      ->orWhereRaw('MATCH(keywords) AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
+                      ->orWhereRaw('MATCH(summary)  AGAINST(? IN BOOLEAN MODE)', [$booleanQuery])
+                      ->orWhereRaw('MATCH(content)  AGAINST(? IN BOOLEAN MODE)', [$booleanQuery]);
+                });
+        }
+
+        $q->where('index_version', $query->getIndexVersion());
 
         // ── Filters from SearchQuery ──────────────────────────────────────────
 
@@ -172,11 +207,14 @@ class DatabaseSearchDriver extends AbstractSearchDriver
         }
 
         if ($query->getAuthor() !== null) {
-            $q->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.author')) = ?", [$query->getAuthor()]);
+            // Laravel's fluent JSON path syntax compiles to the right SQL per
+            // driver (JSON_UNQUOTE/JSON_EXTRACT on MySQL, json_extract on
+            // SQLite) instead of hardcoding one engine's raw SQL.
+            $q->where('metadata->author', $query->getAuthor());
         }
 
         if ($query->getTaxonomy() !== null) {
-            $q->whereRaw("JSON_CONTAINS(metadata, ?)", [json_encode(['taxonomy' => $query->getTaxonomy()])]);
+            $q->where('metadata->taxonomy', $query->getTaxonomy());
         }
 
         // ── Sort ─────────────────────────────────────────────────────────────
@@ -197,7 +235,9 @@ class DatabaseSearchDriver extends AbstractSearchDriver
 
         // ── Facets ────────────────────────────────────────────────────────────
 
-        $facets = $this->buildFacets($booleanQuery, $query);
+        $facets = $isSqlite
+            ? $this->buildFacetsSqlite($likeTerm, $query)
+            : $this->buildFacets($booleanQuery, $query);
 
         $took = round((microtime(true) - $start) * 1000, 2);
 
@@ -238,6 +278,37 @@ class DatabaseSearchDriver extends AbstractSearchDriver
         return [
             'type'   => (clone $base)->selectRaw('type, COUNT(*) as count')->groupBy('type')->pluck('count', 'type')->toArray(),
             'year'   => (clone $base)->selectRaw('YEAR(published_at) as year, COUNT(*) as count')->whereNotNull('published_at')->groupBy('year')->orderByDesc('year')->pluck('count', 'year')->toArray(),
+            'module' => (clone $base)->selectRaw('module, COUNT(*) as count')->groupBy('module')->pluck('count', 'module')->toArray(),
+            'locale' => (clone $base)->selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale')->toArray(),
+        ];
+    }
+
+    /** SQLite equivalent of buildFacets() — LIKE instead of MATCH/AGAINST, strftime instead of YEAR(). */
+    private function buildFacetsSqlite(string $likeTerm, SearchQuery $query): array
+    {
+        $base = DB::table('search_index')
+            ->where('index_version', $query->getIndexVersion())
+            ->where(function ($q) use ($likeTerm) {
+                $q->where('title', 'like', $likeTerm)
+                  ->orWhere('keywords', 'like', $likeTerm)
+                  ->orWhere('summary', 'like', $likeTerm)
+                  ->orWhere('content', 'like', $likeTerm);
+            });
+
+        $visibility = $query->getVisibility();
+        if ($visibility !== null) {
+            $base->whereIn('visibility', (array) $visibility);
+        } else {
+            $base->where('visibility', 'public');
+        }
+
+        if ($query->getStatus() !== null) {
+            $base->where('status', $query->getStatus());
+        }
+
+        return [
+            'type'   => (clone $base)->selectRaw('type, COUNT(*) as count')->groupBy('type')->pluck('count', 'type')->toArray(),
+            'year'   => (clone $base)->selectRaw("strftime('%Y', published_at) as year, COUNT(*) as count")->whereNotNull('published_at')->groupBy('year')->orderByDesc('year')->pluck('count', 'year')->toArray(),
             'module' => (clone $base)->selectRaw('module, COUNT(*) as count')->groupBy('module')->pluck('count', 'module')->toArray(),
             'locale' => (clone $base)->selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale')->toArray(),
         ];

@@ -114,6 +114,42 @@ class BlogController extends AbstractContentController
         }
     }
 
+    /**
+     * GET /public/blogs — published-only, no auth. Same query logic as
+     * index() but status is hard-forced (never trusts a client-supplied
+     * status filter) so drafts can never leak through the public route.
+     */
+    public function publicIndex(Request $request)
+    {
+        $query = Blog::with(self::EAGER)->where('status', 'published');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        $sortBy = in_array($request->query('sort_by'), ['title', 'created_at', 'publish_at', 'updated_at'])
+            ? $request->query('sort_by')
+            : 'publish_at';
+        $sortDir = $request->query('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortDir);
+
+        $items = $query->paginate((int) $request->query('per_page', 15));
+        return BlogResource::collection($items);
+    }
+
+    /** GET /public/blogs/{slugOrUuid} — published-only, no auth. Matches by slug (public URLs) or uuid. */
+    public function publicShow(string $slugOrUuid)
+    {
+        $item = Blog::with(self::EAGER)
+            ->where('status', 'published')
+            ->where(fn($q) => $q->where('slug', $slugOrUuid)->orWhere('uuid', $slugOrUuid))
+            ->firstOrFail();
+        return new BlogResource($item);
+    }
+
     /** GET /blogs/featured */
     public function featured(): \Illuminate\Http\JsonResponse
     {

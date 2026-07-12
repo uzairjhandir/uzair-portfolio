@@ -33,6 +33,30 @@ Route::prefix('v1')->group(function () {
     // Public Routes
     Route::get('settings/public', [\App\Http\Controllers\Api\V1\SettingController::class, 'public']);
 
+    // Public Content Read Routes — published-only duplicates of the admin
+    // (auth-gated) CRUD routes below. Phase 9 finding: every content-module
+    // GET route was behind auth:sanctum, so the public Next.js site could
+    // never actually read published content (confirmed via curl: GET /blogs
+    // returned 401 Unauthenticated with no token). These are additive only —
+    // no existing authed route's behavior changed. Status is always
+    // hard-forced server-side in the *Controller::publicIndex/publicShow
+    // methods, never trusted from a client-supplied query param.
+    Route::prefix('public')->group(function () {
+        Route::get('pages/{slugOrUuid}/render', [\App\Http\Controllers\Api\V1\PageBuilderController::class, 'publicRender']);
+
+        Route::get('blogs', [\App\Modules\Blog\BlogController::class, 'publicIndex']);
+        Route::get('blogs/{slugOrUuid}', [\App\Modules\Blog\BlogController::class, 'publicShow']);
+
+        Route::get('portfolios', [\App\Modules\Portfolio\PortfolioController::class, 'publicIndex']);
+        Route::get('portfolios/{slugOrUuid}', [\App\Modules\Portfolio\PortfolioController::class, 'publicShow']);
+
+        Route::get('case-studies', [\App\Modules\CaseStudy\CaseStudyController::class, 'publicIndex']);
+        Route::get('case-studies/{slugOrUuid}', [\App\Modules\CaseStudy\CaseStudyController::class, 'publicShow']);
+
+        Route::get('downloads', [\App\Modules\Downloads\DownloadController::class, 'publicIndex']);
+        Route::get('downloads/{slugOrUuid}', [\App\Modules\Downloads\DownloadController::class, 'publicShow']);
+    });
+
     // User Routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('users', UserController::class)->parameters(['users' => 'uuid']);
@@ -201,7 +225,10 @@ Route::prefix('v1')->group(function () {
     // Downloads-specific (mix of auth and public)
     Route::get('downloads/featured',         [\App\Modules\Downloads\DownloadController::class, 'featured']);
     Route::get('downloads/popular',          [\App\Modules\Downloads\DownloadController::class, 'popular']);
-    Route::post('downloads/{uuid}/serve',    [\App\Modules\Downloads\DownloadController::class, 'serve'])->middleware('auth:sanctum');
+    // No auth:sanctum here — DownloadPolicy::download() already enforces access_level
+    // (public/authenticated/subscriber/customer/premium/role/permission) per-item,
+    // including explicit support for anonymous users on 'public' downloads.
+    Route::post('downloads/{uuid}/serve',    [\App\Modules\Downloads\DownloadController::class, 'serve']);
     Route::get('dl/{token}',                 [\App\Modules\Downloads\DownloadController::class, 'resolveToken']); // Public — token IS the credential
 
     // ── Module 17: Search Engine ──────────────────────────────────────────────

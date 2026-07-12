@@ -55,6 +55,24 @@ export const useDeleteDownloadMutation = () => {
   });
 };
 
+export interface ServeDownloadResponse {
+  download_url: string;
+  expires_in: number;
+}
+
+/** Public — POST /downloads/{uuid}/serve, no auth:sanctum (DownloadPolicy enforces access_level). */
+export const useServeDownloadMutation = () => {
+  return useMutation({
+    mutationFn: async ({ uuid, email, termsAccepted }: { uuid: string; email?: string; termsAccepted?: boolean }): Promise<ServeDownloadResponse> => {
+      const response = await apiClient.post(`/downloads/${uuid}/serve`, {
+        ...(email ? { email } : {}),
+        ...(termsAccepted ? { terms_accepted: termsAccepted } : {}),
+      });
+      return response.data;
+    },
+  });
+};
+
 export const useDuplicateDownloadMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({

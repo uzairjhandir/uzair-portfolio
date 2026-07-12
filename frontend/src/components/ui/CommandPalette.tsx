@@ -60,7 +60,8 @@ export function CommandPalette() {
     { id: "source", name: "View Source Code", icon: <Terminal size={18} />, action: () => { window.open("https://github.com", "_blank"); setIsOpen(false); }, category: "Actions" },
   ];
 
-  const { data: apiResults, isLoading } = useGlobalSearchQuery(search);
+  const { data: searchResponse, isLoading } = useGlobalSearchQuery(search);
+  const apiResults = searchResponse?.data || [];
 
   const filteredCommands = commands.filter((cmd) =>
     cmd.name.toLowerCase().includes(search.toLowerCase()) || cmd.category.toLowerCase().includes(search.toLowerCase())
@@ -117,7 +118,7 @@ export function CommandPalette() {
                       <div className="space-y-1">
                         {apiResults.map((res) => (
                           <button
-                            key={`${res.type}-${res.id}`}
+                            key={res.uuid}
                             onClick={() => { router.push(res.url); setIsOpen(false); }}
                             className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left text-white/80 hover:text-white hover:bg-white/5 transition-colors group"
                           >

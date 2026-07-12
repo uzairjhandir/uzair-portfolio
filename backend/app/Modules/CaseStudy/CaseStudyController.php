@@ -121,6 +121,38 @@ class CaseStudyController extends AbstractContentController
         }
     }
 
+    /** GET /public/case-studies — published-only, no auth. */
+    public function publicIndex(Request $request)
+    {
+        $query = CaseStudy::with(self::EAGER)->where('status', 'published');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        $sortBy = in_array($request->query('sort_by'), ['title', 'created_at', 'updated_at'])
+            ? $request->query('sort_by')
+            : 'created_at';
+        $sortDir = $request->query('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortDir);
+
+        $items = $query->paginate((int) $request->query('per_page', 15));
+        return CaseStudyResource::collection($items);
+    }
+
+    /** GET /public/case-studies/{slugOrUuid} — published-only, no auth. Matches by slug or uuid. */
+    public function publicShow(string $slugOrUuid)
+    {
+        $item = CaseStudy::with(self::EAGER)
+            ->where('status', 'published')
+            ->where(fn($q) => $q->where('slug', $slugOrUuid)->orWhere('uuid', $slugOrUuid))
+            ->firstOrFail();
+        return new CaseStudyResource($item);
+    }
+
     /** GET /case-studies/featured */
     public function featured(): \Illuminate\Http\JsonResponse
     {

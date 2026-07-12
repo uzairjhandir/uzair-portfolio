@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 import { Inter, Poppins, JetBrains_Mono } from "next/font/google";
+import axios from "axios";
 import "./globals.css";
 import { LenisProvider } from "@/providers/lenis-provider";
 import { CursorProvider } from "@/providers/cursor-provider";
@@ -37,72 +38,113 @@ export const viewport: Viewport = {
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Muhammad Uzair — Full Stack Web Developer & DevOps Engineer",
-    template: "%s | Muhammad Uzair"
-  },
-  description: "Portfolio of Muhammad Uzair: WordPress Expert, Next.js Developer, and Linux Server Administrator. Building fast, secure, and high-converting web applications.",
-  keywords: ["Next.js Developer", "React Developer", "WordPress Expert", "WooCommerce", "Web Development Agency", "Freelance Developer", "Linux Server Admin"],
-  authors: [{ name: "Muhammad Uzair", url: siteUrl }],
-  creator: "Muhammad Uzair",
-  publisher: "Muhammad Uzair",
-  alternates: {
-    canonical: './',
-  },
-  verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION,
-    other: {
-      "msvalidate.01": process.env.BING_SITE_VERIFICATION ? [process.env.BING_SITE_VERIFICATION] : [],
+const DEFAULT_SITE_NAME = "Muhammad Uzair — Full Stack Web Developer & DevOps Engineer";
+const DEFAULT_DESCRIPTION = "Portfolio of Muhammad Uzair: WordPress Expert, Next.js Developer, and Linux Server Administrator. Building fast, secure, and high-converting web applications.";
+
+/**
+ * Flattens the /settings/public envelope ({data: {categorySlug: {settings: [{key,value}]}}})
+ * into a single key→value map. Returns {} on any failure so the caller's
+ * hardcoded defaults are used — the public site must never break because
+ * Settings admin data is missing or the backend is unreachable.
+ */
+async function getPublicSettings(): Promise<Record<string, string>> {
+  try {
+    const res = await axios.get(`${API_URL}/settings/public`);
+    const categories = res.data?.data || {};
+    const flat: Record<string, string> = {};
+    for (const category of Object.values(categories) as any[]) {
+      for (const setting of category.settings || []) {
+        if (setting.value !== null && setting.value !== undefined) {
+          flat[setting.key] = setting.value;
+        }
+      }
+    }
+    return flat;
+  } catch {
+    return {};
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicSettings();
+
+  const siteName = settings['general.site_name'] || DEFAULT_SITE_NAME;
+  const description = settings['seo.meta_description'] || DEFAULT_DESCRIPTION;
+  const metaTitle = settings['seo.meta_title'] || siteName;
+  const favicon = settings['general.favicon'];
+  const robots = settings['seo.robots'] || 'index, follow';
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: metaTitle,
+      template: `%s | ${siteName}`,
     },
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteUrl,
-    title: "Muhammad Uzair — Premium Web Experiences",
-    description: "I engineer premium digital experiences that look stunning and perform flawlessly. From high-conversion frontends to robust production infrastructure.",
-    siteName: "Muhammad Uzair Portfolio",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Muhammad Uzair Portfolio",
+    description,
+    keywords: ["Next.js Developer", "React Developer", "WordPress Expert", "WooCommerce", "Web Development Agency", "Freelance Developer", "Linux Server Admin"],
+    authors: [{ name: "Muhammad Uzair", url: siteUrl }],
+    creator: "Muhammad Uzair",
+    publisher: "Muhammad Uzair",
+    alternates: {
+      canonical: './',
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+      other: {
+        "msvalidate.01": process.env.BING_SITE_VERIFICATION ? [process.env.BING_SITE_VERIFICATION] : [],
       },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Muhammad Uzair — Full Stack Developer",
-    description: "Building fast, secure, and high-converting web applications.",
-    creator: "@uzair",
-    images: ["/og-image.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
     },
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' }
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
-    ]
-  },
-  manifest: '/site.webmanifest',
-};
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: siteUrl,
+      title: metaTitle,
+      description,
+      siteName,
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: siteName,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metaTitle,
+      description,
+      creator: "@uzair",
+      images: ["/og-image.jpg"],
+    },
+    robots: {
+      index: robots.includes('index') && !robots.includes('noindex'),
+      follow: robots.includes('follow') && !robots.includes('nofollow'),
+      googleBot: {
+        index: robots.includes('index') && !robots.includes('noindex'),
+        follow: robots.includes('follow') && !robots.includes('nofollow'),
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    icons: favicon ? {
+      icon: [{ url: favicon }],
+      apple: [{ url: favicon }],
+    } : {
+      icon: [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon.ico', sizes: '32x32' }
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+      ]
+    },
+    manifest: '/site.webmanifest',
+  };
+}
 
 const jsonLd = [
   {

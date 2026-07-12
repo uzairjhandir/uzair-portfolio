@@ -13,6 +13,17 @@ export const useCaseStudyListQuery = (filters: CaseStudyFilters = {}) => {
   });
 };
 
+/** Public, unauthenticated (published-only), for the public /case-studies pages — never used by admin. */
+export const usePublicCaseStudyListQuery = (filters: CaseStudyFilters = {}) => {
+  return useQuery({
+    queryKey: [...caseStudyKeys.list(filters), 'public'],
+    queryFn: async (): Promise<CaseStudyListResponse> => {
+      const response = await apiClient.get('/public/case-studies', { params: filters });
+      return response.data;
+    },
+  });
+};
+
 export const useCaseStudyDetailQuery = (uuid: string) => {
   return useQuery({
     queryKey: caseStudyKeys.detail(uuid),

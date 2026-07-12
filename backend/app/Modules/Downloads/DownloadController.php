@@ -110,6 +110,38 @@ class DownloadController extends AbstractContentController
         }
     }
 
+    /** GET /public/downloads — published-only, no auth. */
+    public function publicIndex(Request $request)
+    {
+        $query = Download::with(self::EAGER)->where('status', 'published');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        $sortBy = in_array($request->query('sort_by'), ['title', 'created_at', 'updated_at', 'download_count'])
+            ? $request->query('sort_by')
+            : 'created_at';
+        $sortDir = $request->query('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortDir);
+
+        $items = $query->paginate((int) $request->query('per_page', 15));
+        return DownloadResource::collection($items);
+    }
+
+    /** GET /public/downloads/{slugOrUuid} — published-only, no auth. Matches by slug or uuid. */
+    public function publicShow(string $slugOrUuid)
+    {
+        $item = Download::with(self::EAGER)
+            ->where('status', 'published')
+            ->where(fn($q) => $q->where('slug', $slugOrUuid)->orWhere('uuid', $slugOrUuid))
+            ->firstOrFail();
+        return new DownloadResource($item);
+    }
+
     /** GET /downloads/featured */
     public function featured()
     {

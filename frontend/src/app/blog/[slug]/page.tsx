@@ -10,7 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1
 
 async function getPost(slug: string): Promise<BlogPost | null> {
   try {
-    const res = await axios.get(`${API_URL}/blogs/${slug}`);
+    const res = await axios.get(`${API_URL}/public/blogs/${slug}`);
     return res.data.data;
   } catch {
     return null;
@@ -19,7 +19,7 @@ async function getPost(slug: string): Promise<BlogPost | null> {
 
 async function getAllPosts(): Promise<BlogPost[]> {
   try {
-    const res = await axios.get(`${API_URL}/blogs`);
+    const res = await axios.get(`${API_URL}/public/blogs`, { params: { per_page: 100 } });
     return res.data.data || [];
   } catch {
     return [];

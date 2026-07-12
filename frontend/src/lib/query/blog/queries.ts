@@ -13,6 +13,17 @@ export const useBlogListQuery = (filters: BlogFilters = {}) => {
   });
 };
 
+/** Public, unauthenticated (published-only), for the public /blog pages — never used by admin. */
+export const usePublicBlogListQuery = (filters: BlogFilters = {}) => {
+  return useQuery({
+    queryKey: [...blogKeys.list(filters), 'public'],
+    queryFn: async (): Promise<BlogListResponse> => {
+      const response = await apiClient.get('/public/blogs', { params: filters });
+      return response.data;
+    },
+  });
+};
+
 export const useBlogDetailQuery = (uuid: string) => {
   return useQuery({
     queryKey: blogKeys.detail(uuid),
