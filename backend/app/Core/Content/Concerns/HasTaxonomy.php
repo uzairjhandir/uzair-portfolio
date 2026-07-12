@@ -18,7 +18,7 @@ trait HasTaxonomy
         return $this->morphToMany(TaxonomyTerm::class, 'termable', 'taxonomy_termables')
             ->withPivot('sort_order')
             ->with('taxonomy')
-            ->orderBy('sort_order');
+            ->orderBy('taxonomy_termables.sort_order');
     }
 
     /**

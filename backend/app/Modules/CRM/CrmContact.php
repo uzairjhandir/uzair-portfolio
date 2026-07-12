@@ -15,6 +15,11 @@ class CrmContact extends Model
 {
     use HasUuids, SoftDeletes;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'crm_contacts';
 
     protected $fillable = [

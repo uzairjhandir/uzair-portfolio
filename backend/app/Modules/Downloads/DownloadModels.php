@@ -34,6 +34,11 @@ class DownloadToken extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'download_tokens';
 
     protected $fillable = [

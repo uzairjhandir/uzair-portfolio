@@ -22,6 +22,11 @@ class UrlRewrite extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'url_rewrites';
 
     protected $fillable = [

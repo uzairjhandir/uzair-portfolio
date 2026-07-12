@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Subscriber extends Model
 {
     use HasUuids;
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
     protected $table = 'newsletter_subscribers';
     protected $fillable = ['email', 'first_name', 'last_name', 'status', 'unsubscribe_token', 'confirmed_at', 'unsubscribed_at', 'metadata', 'ip_address', 'crm_contact_id'];
     protected $casts = ['confirmed_at' => 'datetime', 'unsubscribed_at' => 'datetime', 'metadata' => 'json'];
@@ -31,6 +36,11 @@ class Subscriber extends Model
 class NewsletterList extends Model
 {
     use HasUuids;
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
     protected $table = 'newsletter_lists';
     protected $fillable = ['name', 'slug', 'description', 'is_public', 'is_default', 'subscriber_count', 'created_by'];
     protected $casts = ['is_public' => 'boolean', 'is_default' => 'boolean'];
@@ -50,6 +60,11 @@ class NewsletterList extends Model
 class Campaign extends Model
 {
     use HasUuids;
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
     protected $table = 'newsletter_campaigns';
     protected $fillable = ['name', 'subject', 'preview_text', 'html_body', 'plain_body', 'from_name', 'from_email', 'reply_to', 'status', 'scheduled_at', 'sent_at', 'created_by'];
     protected $casts = ['scheduled_at' => 'datetime', 'sent_at' => 'datetime'];

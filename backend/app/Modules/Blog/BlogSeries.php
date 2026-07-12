@@ -9,6 +9,11 @@ class BlogSeries extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'blog_series';
 
     protected $fillable = [

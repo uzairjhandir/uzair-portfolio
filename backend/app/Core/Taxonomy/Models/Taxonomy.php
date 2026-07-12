@@ -9,6 +9,11 @@ class Taxonomy extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $fillable = [
         'name', 'slug', 'description',
         'is_hierarchical', 'is_required',

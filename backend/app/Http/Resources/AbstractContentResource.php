@@ -35,7 +35,9 @@ abstract class AbstractContentResource extends JsonResource
                 'uuid' => $this->author->uuid,
                 'name' => $this->author->name,
             ]),
-            'featured_image' => $this->whenLoaded('featuredImage'),
+            'featured_image' => $this->whenLoaded('featuredImage', fn() =>
+                $this->featuredImage ? new MediaResource($this->featuredImage) : null
+            ),
             'seo' => $this->whenLoaded('seo', fn() => [
                 'title' => $this->seo?->title,
                 'description' => $this->seo?->description,

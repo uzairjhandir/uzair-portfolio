@@ -14,6 +14,11 @@ class ContactSubmission extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'contact_submissions';
 
     protected $fillable = [

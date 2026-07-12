@@ -9,6 +9,11 @@ class CrmNote extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'crm_notes';
 
     protected $fillable = [

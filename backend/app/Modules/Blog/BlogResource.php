@@ -16,6 +16,7 @@ class BlogResource extends AbstractContentResource
     {
         return array_merge(parent::toArray($request), [
             // Blog-specific fields
+            'content'      => $this->content,
             'reading_time' => $this->reading_time,
             'is_featured'  => $this->is_featured,
             'is_pinned'    => $this->is_pinned,
@@ -25,12 +26,12 @@ class BlogResource extends AbstractContentResource
                 'slug'  => $this->series->slug,
             ]),
             'categories' => $this->whenLoaded('terms', fn() =>
-                $this->termsByTaxonomy('category')->map(fn($t) => [
+                $this->terms->filter(fn($t) => $t->taxonomy?->slug === 'category')->values()->map(fn($t) => [
                     'uuid' => $t->uuid, 'name' => $t->name, 'slug' => $t->slug,
                 ])
             ),
             'tags' => $this->whenLoaded('terms', fn() =>
-                $this->termsByTaxonomy('tag')->map(fn($t) => [
+                $this->terms->filter(fn($t) => $t->taxonomy?->slug === 'tag')->values()->map(fn($t) => [
                     'uuid' => $t->uuid, 'name' => $t->name, 'slug' => $t->slug,
                 ])
             ),

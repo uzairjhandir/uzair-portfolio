@@ -9,6 +9,11 @@ class TaxonomyTerm extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $fillable = [
         'taxonomy_id', 'parent_id', 'name', 'slug',
         'description', 'featured_image_id', 'color', 'icon',
@@ -52,6 +57,16 @@ class TaxonomyTerm extends Model
     public function seo()
     {
         return $this->belongsTo(\App\Models\SeoMetadata::class, 'seo_metadata_id');
+    }
+
+    /**
+     * Raw pivot rows attaching this term to any content type (polymorphic,
+     * no dedicated model — used only to recompute the cached `count`).
+     */
+    public function termables()
+    {
+        return \Illuminate\Support\Facades\DB::table('taxonomy_termables')
+            ->where('taxonomy_term_id', $this->id);
     }
 
     // -------------------------------------------------------------------------

@@ -10,6 +10,11 @@ class Redirect extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'redirects';
 
     protected $fillable = [

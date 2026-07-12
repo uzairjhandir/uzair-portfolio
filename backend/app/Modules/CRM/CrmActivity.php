@@ -13,6 +13,11 @@ class CrmActivity extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'crm_activities';
 
     protected $fillable = [

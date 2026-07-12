@@ -9,6 +9,11 @@ class CrmPipelineStage extends Model
 {
     use HasUuids;
 
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
     protected $table = 'crm_pipeline_stages';
 
     protected $fillable = [
