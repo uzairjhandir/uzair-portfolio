@@ -23,13 +23,13 @@ class SeoRoutingListener
 {
     public function handlePublished(ContentPublished $event): void
     {
-        $section = $this->resolveSection($event->model);
+        $section = $this->resolveSection($event->content);
         GenerateSitemapJob::dispatch($section)->onQueue('seo');
     }
 
     public function handleArchived(ContentArchived $event): void
     {
-        $section = $this->resolveSection($event->model);
+        $section = $this->resolveSection($event->content);
         GenerateSitemapJob::dispatch($section)->onQueue('seo');
     }
 

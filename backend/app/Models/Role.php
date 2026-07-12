@@ -20,6 +20,18 @@ class Role extends Model // extends SpatieRole
         return ['uuid'];
     }
 
+    /**
+     * RoleRepository::paginate() and RoleController::show() both eager-load
+     * this relation — role_has_permissions is the standard Spatie
+     * laravel-permission pivot table (already migrated), but this model
+     * never defined the Eloquent relationship over it since it stands in
+     * for Spatie's own Role model.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_has_permissions', 'role_id', 'permission_id');
+    }
+
     /*
     public function getActivitylogOptions(): LogOptions
     {
