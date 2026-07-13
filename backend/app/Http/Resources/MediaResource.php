@@ -51,6 +51,6 @@ class MediaResource extends JsonResource
     // Stub for missing Spatie method
     private function getUrl($conversion = '')
     {
-        return env('APP_URL') . '/storage/' . $this->id . '/' . ($conversion ? $conversion . '-' : '') . $this->file_name;
+        return config('app.url') . '/storage/' . $this->id . '/' . ($conversion ? $conversion . '-' : '') . $this->file_name;
     }
 }

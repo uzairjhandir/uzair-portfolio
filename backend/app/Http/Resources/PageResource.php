@@ -27,7 +27,7 @@ class PageResource extends JsonResource
             'sort_order' => $this->sort_order,
             
             // URLs
-            'preview_url' => env('APP_FRONTEND_URL') . '/api/preview?token=' . $this->preview_token . '&slug=' . $this->slug,
+            'preview_url' => config('app.frontend_url') . '/api/preview?token=' . $this->preview_token . '&slug=' . $this->slug,
             
             // Navigation
             'navigation' => [
