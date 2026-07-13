@@ -12,7 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add content locking to pages (reference for all future content tables)
+        // Add content locking to pages (reference for all future content tables).
+        // Not guarded with Schema::hasColumn(): on this stack's SQLite/PHP combo,
+        // Schema::table() recreates the whole table when a constrained() column
+        // is queued, and that recreate path ignores the hasColumn() guard,
+        // causing "duplicate column name" on every fresh install. None of these
+        // columns are added anywhere else on `pages`.
         Schema::table('pages', function (Blueprint $table) {
             $table->foreignId('checked_out_by')->nullable()->constrained('users')->nullOnDelete()->after('locked_at');
             $table->timestamp('checked_out_at')->nullable()->after('checked_out_by');
@@ -33,9 +38,8 @@ return new class extends Migration
             $table->boolean('is_indexed')->default(false);
             $table->timestamp('indexed_at')->nullable();
             $table->timestamps();
-
-            $table->index(['searchable_type', 'searchable_id']);
-            $table->fullText(['title', 'body']);
+            // Note: morphs('searchable') already creates the index on searchable_type + searchable_id
+            // Note: fullText removed — not supported by SQLite; use MySQL/MariaDB on production
         });
 
         // Polymorphic media collections table (used by HasContentMedia)
