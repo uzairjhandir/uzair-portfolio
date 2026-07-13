@@ -59,7 +59,7 @@ export default function BlogPage() {
     ...(status !== "all" ? { status } : {}),
   };
 
-  const { data, isLoading, isFetching } = useBlogListQuery(filters);
+  const { data, isLoading, isFetching, isError, error, refetch } = useBlogListQuery(filters);
 
   const createMutation = useCreateBlogMutation();
   const updateMutation = useUpdateBlogMutation();
@@ -204,6 +204,9 @@ export default function BlogPage() {
         columns={columns}
         data={data?.data ?? []}
         isLoading={isLoading || isFetching}
+        isError={isError}
+        error={error}
+        onRefresh={refetch}
         searchQuery={search}
         setSearchQuery={(v) => { setSearch(v); setPage(1); }}
         totalCount={data?.meta?.total}

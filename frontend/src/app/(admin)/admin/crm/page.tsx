@@ -44,7 +44,7 @@ export default function CrmPage() {
     ...(status !== "all" ? { status } : {}),
   };
 
-  const { data, isLoading, isFetching } = useContactListQuery(filters);
+  const { data, isLoading, isFetching, isError, error, refetch } = useContactListQuery(filters);
 
   const createMutation = useCreateContactMutation();
   const deleteMutation = useDeleteContactMutation();
@@ -110,6 +110,9 @@ export default function CrmPage() {
         columns={columns}
         data={data?.data ?? []}
         isLoading={isLoading || isFetching}
+        isError={isError}
+        error={error}
+        onRefresh={refetch}
         searchQuery={search}
         setSearchQuery={setSearch}
         totalCount={data?.meta?.total}

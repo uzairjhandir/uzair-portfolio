@@ -11,6 +11,8 @@ import { MediaPickerField, MediaRefValue } from '@/components/admin/media/MediaP
 import { useSettingsQuery } from '@/lib/query/settings/queries';
 import { useUpdateSettingsMutation } from '@/lib/query/settings/mutations';
 import { getErrorMessage } from '@/lib/utils';
+import { LoadingState } from '@/components/admin/ui/states/LoadingState';
+import { ErrorState } from '@/components/admin/ui/states/ErrorState';
 
 // The backend has no dedicated "homepage" settings category — it groups
 // site-wide config into categories (general, seo, social, ...). The closest
@@ -32,7 +34,7 @@ function parseValue(raw: unknown): string {
 }
 
 export default function HomepageSettingsPage() {
-  const { data, isLoading } = useSettingsQuery();
+  const { data, isLoading, isError, error, refetch } = useSettingsQuery();
   const updateMutation = useUpdateSettingsMutation();
   const [values, setValues] = useState<Record<string, string>>({});
   const [media, setMedia] = useState<Record<string, MediaRefValue | null>>({});
@@ -73,11 +75,11 @@ export default function HomepageSettingsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <LoadingState message="Loading homepage settings..." />;
+  }
+
+  if (isError) {
+    return <ErrorState message={getErrorMessage(error, "Failed to load homepage settings.")} onRetry={refetch} />;
   }
 
   if (!category) {

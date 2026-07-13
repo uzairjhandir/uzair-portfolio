@@ -6,9 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RefreshCw, Trash2, Database, Clock, AlertTriangle, Layers } from "lucide-react";
 import { useSearchHealthQuery, useRebuildSearchIndexMutation, useFlushSearchIndexMutation } from "@/lib/query/search-admin/queries";
+import { LoadingState } from "@/components/admin/ui/states/LoadingState";
+import { ErrorState } from "@/components/admin/ui/states/ErrorState";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function SearchAdminPage() {
-  const { data: health, isLoading, isError } = useSearchHealthQuery();
+  const { data: health, isLoading, isError, error, refetch } = useSearchHealthQuery();
   const rebuild = useRebuildSearchIndexMutation();
   const flush = useFlushSearchIndexMutation();
 
@@ -47,9 +50,9 @@ export default function SearchAdminPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading search health...</p>
+        <LoadingState message="Loading search health..." />
       ) : isError || !health ? (
-        <p className="text-red-500 text-sm">Failed to load search health.</p>
+        <ErrorState message={getErrorMessage(error, "Failed to load search health.")} onRetry={refetch} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>

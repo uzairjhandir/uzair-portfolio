@@ -59,7 +59,7 @@ export default function PortfolioPage() {
     ...(status !== "all" ? { status } : {}),
   };
 
-  const { data, isLoading, isFetching } = usePortfolioListQuery(filters);
+  const { data, isLoading, isFetching, isError, error, refetch } = usePortfolioListQuery(filters);
 
   const createMutation = useCreatePortfolioMutation();
   const updateMutation = useUpdatePortfolioMutation();
@@ -204,6 +204,9 @@ export default function PortfolioPage() {
         columns={columns}
         data={data?.data ?? []}
         isLoading={isLoading || isFetching}
+        isError={isError}
+        error={error}
+        onRefresh={refetch}
         searchQuery={search}
         setSearchQuery={(v) => { setSearch(v); setPage(1); }}
         totalCount={data?.meta?.total}

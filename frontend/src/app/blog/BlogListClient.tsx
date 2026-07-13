@@ -7,7 +7,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { BlogPost } from "@/lib/query/blog/types";
 
 export function BlogListClient() {
-  const { data: response, isLoading } = usePublicBlogListQuery();
+  const { data: response, isLoading, isError, refetch } = usePublicBlogListQuery();
   const blogData = response?.data || [];
 
   if (isLoading) {
@@ -17,6 +17,17 @@ export function BlogListClient() {
           <div className="h-8 w-64 bg-white/10 rounded"></div>
           <div className="h-4 w-48 bg-white/10 rounded"></div>
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background pb-32 pt-40 flex flex-col items-center justify-center gap-4">
+        <p className="text-red-400">Failed to load articles. Please try again.</p>
+        <button onClick={() => refetch()} className="text-sm text-white underline underline-offset-4 hover:text-accent transition-colors">
+          Retry
+        </button>
       </div>
     );
   }

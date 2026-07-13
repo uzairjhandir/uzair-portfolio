@@ -59,7 +59,7 @@ export default function CaseStudiesPage() {
     ...(status !== "all" ? { status } : {}),
   };
 
-  const { data, isLoading, isFetching } = useCaseStudyListQuery(filters);
+  const { data, isLoading, isFetching, isError, error, refetch } = useCaseStudyListQuery(filters);
 
   const createMutation = useCreateCaseStudyMutation();
   const updateMutation = useUpdateCaseStudyMutation();
@@ -202,6 +202,9 @@ export default function CaseStudiesPage() {
         columns={columns}
         data={data?.data ?? []}
         isLoading={isLoading || isFetching}
+        isError={isError}
+        error={error}
+        onRefresh={refetch}
         searchQuery={search}
         setSearchQuery={(v) => { setSearch(v); setPage(1); }}
         totalCount={data?.meta?.total}

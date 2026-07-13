@@ -59,7 +59,7 @@ export default function DownloadsPage() {
     ...(status !== "all" ? { status } : {}),
   };
 
-  const { data, isLoading, isFetching } = useDownloadListQuery(filters);
+  const { data, isLoading, isFetching, isError, error, refetch } = useDownloadListQuery(filters);
 
   const createMutation = useCreateDownloadMutation();
   const updateMutation = useUpdateDownloadMutation();
@@ -203,6 +203,9 @@ export default function DownloadsPage() {
         columns={columns}
         data={data?.data ?? []}
         isLoading={isLoading || isFetching}
+        isError={isError}
+        error={error}
+        onRefresh={refetch}
         searchQuery={search}
         setSearchQuery={(v) => { setSearch(v); setPage(1); }}
         totalCount={data?.meta?.total}

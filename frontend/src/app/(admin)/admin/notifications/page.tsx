@@ -21,7 +21,7 @@ export default function NotificationsPage() {
   const [status, setStatus] = useState("all");
   const [channel, setChannel] = useState("all");
 
-  const { data, isLoading, isFetching } = useNotificationLogQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useNotificationLogQuery({
     ...(status !== "all" ? { status } : {}),
     ...(channel !== "all" ? { channel } : {}),
   });
@@ -102,7 +102,7 @@ export default function NotificationsPage() {
         </Select>
       </div>
 
-      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading || isFetching} totalCount={data?.total} />
+      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading || isFetching} isError={isError} error={error} onRefresh={refetch} totalCount={data?.total} />
     </div>
   );
 }

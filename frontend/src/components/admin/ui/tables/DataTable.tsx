@@ -26,11 +26,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar } from "./DataTableToolbar"
+import { ErrorState } from "../states/ErrorState"
+import { EmptyState } from "../states/EmptyState"
+import { getErrorMessage } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   isLoading?: boolean
+  isError?: boolean
+  error?: unknown
   searchQuery?: string
   setSearchQuery?: (val: string) => void
   onRefresh?: () => void
@@ -52,6 +57,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
+  isError = false,
+  error,
   searchQuery = "",
   setSearchQuery,
   onRefresh,
@@ -105,6 +112,14 @@ export function DataTable<TData, TValue>({
     }
   })
 
+  if (isError) {
+    return (
+      <div className="space-y-4">
+        <ErrorState message={getErrorMessage(error, "Failed to load data.")} onRetry={onRefresh} />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {setSearchQuery && (
@@ -117,66 +132,64 @@ export function DataTable<TData, TValue>({
           bulkActions={bulkActions}
         />
       )}
-      <div className="rounded-md border bg-background">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={i}>
-                  {columns.map((_, j) => (
-                    <TableCell key={j}>
-                      <Skeleton className="h-6 w-full" />
-                    </TableCell>
-                  ))}
+      {!isLoading && data.length === 0 ? (
+        <EmptyState
+          title="No records found"
+          description={searchQuery ? "Try a different search term." : "Get started by creating a new record."}
+        />
+      ) : (
+        <div className="rounded-md border bg-background">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} colSpan={header.colSpan}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No results found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {columns.map((_, j) => (
+                      <TableCell key={j}>
+                        <Skeleton className="h-6 w-full" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
       <DataTablePagination table={table} totalCount={totalCount} />
     </div>
   )

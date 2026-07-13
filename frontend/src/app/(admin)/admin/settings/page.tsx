@@ -5,20 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSettingsQuery } from "@/lib/query/settings/queries";
 import { CategorySettingsForm } from "./CategorySettingsForm";
 import { SmtpTestPanel } from "./SmtpTestPanel";
+import { LoadingState } from "@/components/admin/ui/states/LoadingState";
+import { ErrorState } from "@/components/admin/ui/states/ErrorState";
+import { EmptyState } from "@/components/admin/ui/states/EmptyState";
+import { getErrorMessage } from "@/lib/utils";
 
 // Preferred display order; any other categories the backend returns still
 // render (sorted by their own sort_order), just after these.
 const PRIORITY_ORDER = ["general", "seo", "social", "email", "livechat", "analytics", "security", "api"];
 
 export default function SettingsPage() {
-  const { data: categories, isLoading, isError } = useSettingsQuery();
+  const { data: categories, isLoading, isError, error, refetch } = useSettingsQuery();
 
   if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground animate-pulse">Loading settings...</div>;
+    return <LoadingState message="Loading settings..." />;
   }
 
   if (isError || !categories) {
-    return <div className="p-8 text-center text-red-500">Failed to load settings.</div>;
+    return <ErrorState message={getErrorMessage(error, "Failed to load settings.")} onRetry={refetch} />;
   }
 
   const slugs = Object.keys(categories).sort((a, b) => {
@@ -31,7 +35,7 @@ export default function SettingsPage() {
   });
 
   if (slugs.length === 0) {
-    return <div className="p-8 text-center text-muted-foreground">No settings categories found.</div>;
+    return <EmptyState title="No settings categories found" />;
   }
 
   return (

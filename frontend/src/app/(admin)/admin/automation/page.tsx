@@ -29,7 +29,7 @@ import {
 import { Workflow } from "@/lib/query/automation/types";
 
 export default function AutomationPage() {
-  const { data, isLoading, isFetching } = useWorkflowListQuery();
+  const { data, isLoading, isFetching, isError, error, refetch } = useWorkflowListQuery();
   const createMutation = useCreateWorkflowMutation();
   const updateMutation = useUpdateWorkflowMutation();
   const deleteMutation = useDeleteWorkflowMutation();
@@ -167,7 +167,7 @@ export default function AutomationPage() {
         </Button>
       </div>
 
-      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading || isFetching} totalCount={data?.total} />
+      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading || isFetching} isError={isError} error={error} onRefresh={refetch} totalCount={data?.total} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

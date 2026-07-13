@@ -6,8 +6,10 @@ import { FormDialog } from "../forms/FormDialog"
 import { ConfirmDialog } from "../forms/ConfirmDialog"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { usePermissions } from "@/lib/hooks/auth/usePermissions"
+import { PermissionDenied } from "../states/PermissionDenied"
 
 export interface CrudPermissions {
   view?: string
@@ -42,14 +44,16 @@ export interface CrudConfig<TData> {
 
 export function createCrud<TData extends { id: string | number }>(config: CrudConfig<TData>) {
   return function CrudInstance() {
-    const { 
-      data, 
-      isLoading, 
-      filters, 
-      updateFilter, 
-      create, 
-      update, 
-      deleteRecord, 
+    const {
+      data,
+      isLoading,
+      isError,
+      error,
+      filters,
+      updateFilter,
+      create,
+      update,
+      deleteRecord,
       refetch,
       meta
     } = useGenericCrud<TData>({
@@ -116,6 +120,15 @@ export function createCrud<TData extends { id: string | number }>(config: CrudCo
     const canDelete = hasPermission(config.permissions?.delete)
     const canExport = hasPermission(config.permissions?.export)
 
+    if (!canView) {
+      return (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold tracking-tight">{config.title}</h2>
+          <PermissionDenied />
+        </div>
+      )
+    }
+
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -134,10 +147,12 @@ export function createCrud<TData extends { id: string | number }>(config: CrudCo
           columns={config.columns}
           data={data}
           isLoading={isLoading}
+          isError={isError}
+          error={error}
           searchQuery={filters.search}
           setSearchQuery={(val) => updateFilter('search', val)}
           onRefresh={refetch}
-          onExport={canExport ? () => alert("Export not implemented") : undefined}
+          onExport={canExport ? () => toast.info("Export isn't implemented for this module yet.") : undefined}
           totalCount={meta?.total}
           bulkActions={config.bulkActions}
           onView={canView ? handleView : undefined}

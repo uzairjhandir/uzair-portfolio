@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, AlertTriangle, XCircle, HelpCircle } from "lucide-react"
 import { useSystemHealthQuery, HealthCheckResultDto } from "@/lib/query/system-health/queries"
+import { LoadingState } from "@/components/admin/ui/states/LoadingState"
+import { ErrorState } from "@/components/admin/ui/states/ErrorState"
+import { getErrorMessage } from "@/lib/utils"
 
 const STATUS_ICON: Record<string, typeof CheckCircle2> = {
   ok: CheckCircle2,
@@ -36,7 +39,7 @@ function CheckCard({ check }: { check: HealthCheckResultDto }) {
 }
 
 export default function SystemHealthPage() {
-  const { data: report, isLoading, isError } = useSystemHealthQuery();
+  const { data: report, isLoading, isError, error, refetch } = useSystemHealthQuery();
 
   return (
     <div className="space-y-6">
@@ -56,9 +59,9 @@ export default function SystemHealthPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading health checks...</p>
+        <LoadingState message="Loading health checks..." />
       ) : isError || !report ? (
-        <p className="text-red-500 text-sm">Failed to load system health.</p>
+        <ErrorState message={getErrorMessage(error, "Failed to load system health.")} onRetry={refetch} />
       ) : (
         <>
           <div className="flex gap-4 text-sm text-muted-foreground">
