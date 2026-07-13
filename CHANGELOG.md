@@ -9,8 +9,20 @@ admin/CMS rebuild — a different, later effort than the static-site
 entries under `[1.0.0] - 2026-07-09` below. See `RELEASE_NOTES_v1.0.md`
 for the full v1.0.0 status snapshot.
 
+### Phase 11 prep — Critical git-tracking fix + pre-deployment hardening
+**Commit:** `43d928eb`
+
+User reviewed the Phase 10.6 report and flagged 5 items before Phase 11 could start; while executing those, found something much bigger:
+
+- **Critical:** most of `backend/config/`, `routes/console.php`, `routes/web.php`, `bootstrap/providers.php`, `RepositoryServiceProvider` (which `bootstrap/app.php` depends on to boot), `composer.json`/`composer.lock`/`artisan`, and even `.env.example` were never committed to git at all — only files touched by specific earlier phase commits ever got `git add`ed. A fresh clone of this repo could not boot the app. Root cause: a blanket `.env*` rule in the root `.gitignore` was also silently excluding `.env.example` — fixed with an explicit `!.env.example` exception. Scanned every restored file for literal secrets before staging; found none.
+- Moved `env('APP_FRONTEND_URL')`/`env('APP_URL')` (PageResource, MediaResource) to `config('app.frontend_url')`/`config('app.url')` — verified the new key resolves both before and after `config:cache`.
+- `.env.example` now documents the 2 app-specific vars with production guidance.
+- `DEPLOYMENT.md` gained a full Laravel backend section (PHP reqs, deploy steps, queue worker/Supervisor-vs-cron, scheduler, smoke test) — was frontend-only before.
+- `INSTALL/OPERATIONS/SECURITY/DISASTER_RECOVERY/TROUBLESHOOTING/API_REFERENCE.md` rewritten from 1-line placeholders into real content.
+- Confirmed `config/scramble.php` is dead config (package never `composer require`d, no `/docs` endpoint exists) and `ContentExpired` event is never dispatched (scheduled auto-expiry unimplemented) — both documented, neither built out (out of scope).
+
 ### Phase 10.6 — Final Production Audit (Release Candidate)
-**Commit:** (pending)
+**Commit:** `66663994`
 
 Read-only audit per user's 5-section checklist; one critical fix made under the phase's own escape clause ("no code unless critical").
 
