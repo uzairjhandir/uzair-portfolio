@@ -314,11 +314,18 @@ Route::prefix('v1')->group(function () {
     });
 
     // ── Module 24: Production Hardening (Health Endpoints) ────────────────────
+    // live/ready/startup stay public — load balancer / uptime probes need them
+    // unauthenticated, and they reveal nothing beyond an ok/unavailable status.
     Route::prefix('health')->group(function () {
         Route::get('live',    [\App\Modules\Production\Http\Controllers\HealthEndpointController::class, 'live']);
         Route::get('ready',   [\App\Modules\Production\Http\Controllers\HealthEndpointController::class, 'ready']);
         Route::get('startup', [\App\Modules\Production\Http\Controllers\HealthEndpointController::class, 'startup']);
-        Route::get('details', [\App\Modules\Production\Http\Controllers\HealthEndpointController::class, 'details']); // Should be protected in prod
+    });
+    // 'details' leaks internal infrastructure info (server file paths, DB
+    // latency, queue backlog, SEO scores) - was public with only a
+    // "Should be protected in prod" comment that was never acted on.
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+        Route::get('health/details', [\App\Modules\Production\Http\Controllers\HealthEndpointController::class, 'details']);
     });
 
     // ── Module 26: Live Chat Configuration ────────────────────────────────────

@@ -9,6 +9,20 @@ admin/CMS rebuild — a different, later effort than the static-site
 entries under `[1.0.0] - 2026-07-09` below. See `RELEASE_NOTES_v1.0.md`
 for the full v1.0.0 status snapshot.
 
+### Phase 10.6 — Final Production Audit (Release Candidate)
+**Commit:** (pending)
+
+Read-only audit per user's 5-section checklist; one critical fix made under the phase's own escape clause ("no code unless critical").
+
+- **Fixed:** `GET /api/v1/health/details` was publicly reachable with no auth — leaks PHP version, DB latency, disk paths, queue backlog, SEO scores. The route already had a `// Should be protected in prod` comment that was never acted on. Moved it behind `auth:sanctum`+`verified`; `live`/`ready`/`startup` stay public (load-balancer probes, no sensitive data).
+- **Found, not fixed (deferred to user):** `PageResource.php` calls `env('APP_FRONTEND_URL')` directly (anti-pattern — breaks after `config:cache`), and the var is unset in `.env` — `preview_url` has been incomplete this whole project.
+- **Found, not fixed:** no `Schedule::` entries anywhere in `routes/console.php` — nothing is actually scheduled.
+- **Deleted** (user-approved via AskUserQuestion): `backend/test_login.php` (hardcoded admin credentials, bypasses HTTP) and `backend/check_tables.php` (dumps full DB schema) — both untracked by git but present on disk at the Laravel project root, a real risk under a WHM/cPanel document-root misconfiguration.
+- Verified: 0 pending migrations, `.env`/`.env.local` correctly gitignored, no other stray root-level PHP files, no TODO/FIXME in routes, config/route/view/event cache all succeed cleanly.
+- Dev DB confirmed to contain only the Phase 9.3 verification records (2 Blogs, 1 Portfolio, 1 Case Study, 1 Download, 1 User) — flagged as must-not-ship-to-production, not deleted (still serves as verification proof).
+- Documentation audit: README/INSTALL/DEPLOYMENT/OPERATIONS/SECURITY/BACKUP/DISASTER_RECOVERY/TROUBLESHOOTING/API_REFERENCE/CHANGELOG/VERSION all exist. DEPLOYMENT.md/BACKUP.md have real content but only cover the Next.js frontend, not the Laravel backend. OPERATIONS/SECURITY/DISASTER_RECOVERY/TROUBLESHOOTING/API_REFERENCE/INSTALL are 1-line stubs despite frontmatter claiming `status: Frozen (Production Ready)`.
+- **Browser QA / Lighthouse: still not performed** — no browser automation tool exists in this environment; every verification in Phases 10.3–10.6 has been build/lint/typecheck/curl-level only.
+
 ### Phase 10.5 — Performance, Accessibility, SEO & Security Hardening
 **Commit:** `310bad0f`
 
