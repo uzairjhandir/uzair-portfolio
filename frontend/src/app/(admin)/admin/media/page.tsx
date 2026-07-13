@@ -229,7 +229,7 @@ export default function MediaLibraryPage() {
                 )}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   {showTrashed ? (
-                    <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => handleRestore(file)} title="Restore">
+                    <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => handleRestore(file)} title="Restore" aria-label={`Restore ${file.file_name}`}>
                       <RotateCcw className="w-4 h-4" />
                     </Button>
                   ) : (
@@ -239,6 +239,7 @@ export default function MediaLibraryPage() {
                         variant="secondary"
                         className="h-8 w-8"
                         title="Replace"
+                        aria-label={`Replace ${file.file_name}`}
                         onClick={() => {
                           setReplaceTarget(file.uuid);
                           replaceInputRef.current?.click();
@@ -246,10 +247,10 @@ export default function MediaLibraryPage() {
                       >
                         <UploadCloud className="w-4 h-4" />
                       </Button>
-                      <Button size="icon" variant="secondary" className="h-8 w-8" title="Edit metadata" onClick={() => openEdit(file)}>
+                      <Button size="icon" variant="secondary" className="h-8 w-8" title="Edit metadata" aria-label={`Edit metadata for ${file.file_name}`} onClick={() => openEdit(file)}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
-                      <Button size="icon" variant="destructive" className="h-8 w-8" title="Delete" onClick={() => handleDelete(file)}>
+                      <Button size="icon" variant="destructive" className="h-8 w-8" title="Delete" aria-label={`Delete ${file.file_name}`} onClick={() => handleDelete(file)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </>

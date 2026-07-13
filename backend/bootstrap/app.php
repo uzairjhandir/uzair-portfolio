@@ -15,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Providers\RepositoryServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // The 'api' group had no throttling at all — RateLimiter::for('api')
+        // is registered in AppServiceProvider::boot().
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // ContentPublishingService::transition() throws this for illegal

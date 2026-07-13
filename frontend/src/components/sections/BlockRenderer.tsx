@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { PageBlockRender } from "@/lib/query/pages/types";
 
 /**
@@ -130,8 +131,14 @@ export function BlockRenderer({ block }: { block: PageBlockRender }) {
             {Array.isArray(content.logos) && (
               <div className="flex flex-wrap items-center justify-center gap-12 opacity-60">
                 {content.logos.map((logo, idx: number) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={idx} src={logo.url} alt={logo.name || "Client logo"} className="h-8 object-contain" />
+                  <Image
+                    key={idx}
+                    src={logo.url}
+                    alt={logo.name || "Client logo"}
+                    width={120}
+                    height={32}
+                    className="h-8 w-auto object-contain"
+                  />
                 ))}
               </div>
             )}

@@ -34,6 +34,7 @@ export function SearchClient() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Search blog, portfolio, case studies, downloads..."
+                aria-label="Search the site"
                 className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-muted-foreground focus:outline-none focus:border-accent text-lg"
               />
             </form>

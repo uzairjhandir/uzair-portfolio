@@ -188,6 +188,7 @@ export function SectionEditorDialog({
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label={`Remove action ${i + 1}`}
                     onClick={() =>
                       setContent((c) => ({
                         ...c,
@@ -232,6 +233,7 @@ export function SectionEditorDialog({
                       type="button"
                       variant="ghost"
                       size="icon"
+                      aria-label={`Remove item ${i + 1}`}
                       onClick={() =>
                         setContent((c) => ({
                           ...c,

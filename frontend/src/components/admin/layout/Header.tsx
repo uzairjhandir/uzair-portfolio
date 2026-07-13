@@ -48,13 +48,14 @@ export function Header() {
             {user?.name?.charAt(0) || 'A'}
           </div>
           
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => logout()}
             disabled={isLoggingOut}
             className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 ml-1"
             title="Logout"
+            aria-label="Log out"
           >
             <LogOut className="w-4 h-4" />
           </Button>

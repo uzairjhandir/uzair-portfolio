@@ -1,13 +1,24 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ArrowRight, Star } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FadeIn } from "@/components/animations/FadeIn";
-import { Hero3DLaptop } from "./Hero3DLaptop";
 import { TypeAnimation } from "react-type-animation";
+
+// three.js / @react-three/* is one of the largest dependencies in the
+// bundle and can't render server-side anyway (WebGL needs a browser) —
+// load it only on the client, after the rest of the hero has painted.
+const Hero3DLaptop = dynamic(
+  () => import("./Hero3DLaptop").then((mod) => mod.Hero3DLaptop),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-full min-h-[400px] animate-pulse bg-white/5 rounded-2xl" />,
+  }
+);
 import { 
   siNextdotjs, siWordpress, siLaravel, siLinux
 } from "simple-icons";

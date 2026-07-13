@@ -94,6 +94,7 @@ export function CommandPalette() {
                 autoFocus
                 className="flex-1 bg-transparent text-white placeholder-muted-foreground focus:outline-none text-lg"
                 placeholder="Type a command or search..."
+                aria-label="Command palette search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

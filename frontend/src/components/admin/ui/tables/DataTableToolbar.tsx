@@ -38,6 +38,7 @@ export function DataTableToolbar<TData>({
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search..."
+            aria-label="Search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             className="h-9 pl-8"

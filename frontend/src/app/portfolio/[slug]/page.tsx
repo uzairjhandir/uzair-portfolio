@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { ArrowLeft, ArrowRight, ExternalLink, ArrowUpRight } from "lucide-react";
@@ -158,9 +159,14 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
                 <h2 className="text-3xl font-heading font-bold text-white mb-6">Gallery</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {project.gallery.map((img, idx) => (
-                    <div key={img.uuid} className={`rounded-2xl overflow-hidden border border-white/10 ${idx === 0 ? 'md:col-span-2' : ''}`}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img.original_url} alt={`${project.title} screenshot ${idx + 1}`} className="w-full h-auto object-cover" />
+                    <div key={img.uuid} className={`relative aspect-video rounded-2xl overflow-hidden border border-white/10 ${idx === 0 ? 'md:col-span-2' : ''}`}>
+                      <Image
+                        src={img.original_url}
+                        alt={`${project.title} screenshot ${idx + 1}`}
+                        fill
+                        sizes="(min-width: 768px) 50vw, 100vw"
+                        className="object-cover"
+                      />
                     </div>
                   ))}
                 </div>

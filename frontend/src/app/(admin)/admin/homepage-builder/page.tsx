@@ -204,6 +204,7 @@ export default function HomepageBuilderPage() {
                         className="h-5 w-5"
                         disabled={i === 0}
                         onClick={() => move(type.slug, -1)}
+                        aria-label={`Move ${type.name} up`}
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
                       </Button>
@@ -213,6 +214,7 @@ export default function HomepageBuilderPage() {
                         className="h-5 w-5"
                         disabled={i === sectionTypes.length - 1}
                         onClick={() => move(type.slug, 1)}
+                        aria-label={`Move ${type.name} down`}
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
                       </Button>
@@ -248,6 +250,7 @@ export default function HomepageBuilderPage() {
                           variant="ghost"
                           size="icon"
                           title="Duplicate"
+                          aria-label={`Duplicate ${type.name}`}
                           onClick={() => handleDuplicate(block, type.name)}
                         >
                           <Copy className="w-4 h-4" />
@@ -256,6 +259,7 @@ export default function HomepageBuilderPage() {
                           variant="ghost"
                           size="icon"
                           title="Delete"
+                          aria-label={`Delete ${type.name}`}
                           onClick={() => handleDelete(block, type.name)}
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />

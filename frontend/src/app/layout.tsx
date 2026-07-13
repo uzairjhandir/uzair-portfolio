@@ -10,7 +10,7 @@ import { CursorProvider } from "@/providers/cursor-provider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Loader } from "@/components/layout/Loader";
-import { CommandPalette } from "@/components/ui/CommandPalette";
+import { LazyCommandPalette } from "@/components/ui/LazyCommandPalette";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { ChatProvider } from "@/providers/chat-provider";
 import Providers from "@/providers/query-provider";
@@ -199,10 +199,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body 
+      <body
         className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden selection:bg-accent/30 selection:text-white"
         suppressHydrationWarning
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-md focus:bg-white focus:text-primary focus:font-medium"
+        >
+          Skip to main content
+        </a>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
@@ -255,10 +261,10 @@ export default function RootLayout({
           <LenisProvider>
             <CursorProvider>
               <Loader />
-              <CommandPalette />
+              <LazyCommandPalette />
               <ScrollToTop />
               <Navbar />
-              <main className="flex-grow pt-24">{children}</main>
+              <main id="main-content" className="flex-grow pt-24">{children}</main>
               <Footer />
               <LiveChat />
             </CursorProvider>

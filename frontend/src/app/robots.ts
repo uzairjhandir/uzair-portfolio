@@ -7,6 +7,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      // Admin, its login flow, and API responses have no business being
+      // indexed — previously `allow: '/'` covered everything with no
+      // disallow list at all.
+      disallow: ['/admin', '/api'],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };
