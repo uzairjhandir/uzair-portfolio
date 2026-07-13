@@ -9,6 +9,17 @@ admin/CMS rebuild — a different, later effort than the static-site
 entries under `[1.0.0] - 2026-07-09` below. See `RELEASE_NOTES_v1.0.md`
 for the full v1.0.0 status snapshot.
 
+### Phase 10.5 — Performance, Accessibility, SEO & Security Hardening
+**Commit:** `310bad0f`
+
+- Converted `Hero3DLaptop` (three.js/@react-three) and Dashboard's `recharts` chart to `next/dynamic`; lazy-loaded the globally-mounted `CommandPalette`.
+- `next.config.ts` did not exist at all — added it (image `remotePatterns` + security headers in one file).
+- `sitemap.ts` was 100% static (3 hardcoded URLs); rewired to fetch real published content slugs, verified end-to-end against a live backend. `robots.ts` had no disallow list — `/admin` and `/api` were crawlable.
+- Added `aria-label` to 8 icon-only buttons and 4 search inputs with no accessible name; added a skip-to-main-content link (none existed).
+- No `RateLimiter` was registered anywhere — added a default 120/min API limiter and a 5/min login limiter, verified the 6th rapid login attempt returns 429.
+- Verified already-correct: Radix Dialog focus trap, `SecurityHeaders` middleware, upload validation, OpenGraph/Twitter/JSON-LD on all public detail pages.
+- Flagged for Phase 11: CORS hardcoded to `localhost:3000` only.
+
 ### Phase 10.4 — Loading/Empty/Error State Consistency
 **Commit:** `286b73a4`
 

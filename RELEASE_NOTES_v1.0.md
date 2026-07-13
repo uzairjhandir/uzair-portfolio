@@ -24,24 +24,27 @@ This document tracks the actual, verified state of the Laravel + Next.js enterpr
 | Phase 10.2 (Regression Audit) | ✅ Complete |
 | Phase 10.3 (Error Boundaries) | ✅ Complete |
 | Phase 10.4 (Loading/Empty/Error Consistency) | ✅ Complete |
-| Phase 10.5 (Performance/Accessibility/SEO/Security Hardening) | ▶ In progress |
+| Phase 10.5 (Performance/Accessibility/SEO/Security Hardening) | ✅ Complete |
 | Phase 10.6 (Final Production Audit) | ⏳ Pending |
 | Phase 11 (WHM/cPanel + OpenLiteSpeed Deployment) | ⏳ Pending |
 
 See `CHANGELOG.md` for per-phase detail and commit hashes.
 
-## Verification Status (as of Phase 10.4)
+## Verification Status (as of Phase 10.5)
 - Build: ✅ PASS
 - Lint: ✅ PASS (0 errors, 0 warnings)
 - Typecheck: ✅ PASS
 - Backend regression sweep (21 modules, curl-based): ✅ PASS
-- **Browser QA: ❌ NOT VERIFIED** — no browser automation tool available in this environment; all verification has been build/lint/typecheck/curl-level, never an actual rendered browser session. Do not treat this as browser-tested.
+- Security headers, rate limiting, sitemap/robots: ✅ PASS (curl-verified against a live backend)
+- **Browser QA: ❌ NOT VERIFIED** — no browser automation tool available in this environment; all verification has been build/lint/typecheck/curl-level, never an actual rendered browser session. Do not treat this as browser-tested. No Lighthouse run has been performed for the same reason.
 
-## Known Issues (as of Phase 10.4)
+## Known Issues (as of Phase 10.5)
 - Search "Rebuild Index" admin button is a no-op — `AbstractSearchDriver::rebuild()` is an empty stub. Per-record indexing (create/update/delete) works correctly.
 - Seeded Super Admin role has `uuid: null` (AdminSeeder uses Spatie's Role model directly, bypassing `App\Models\Role`'s UUID generation).
 - Navigation/Pages/Redirects admin pages are minimal stub forms (ID + Title only), not full per-module field editors.
 - Homepage Builder page doesn't distinguish a failed initial load from "no home page found."
+- CORS is hardcoded to `http://localhost:3000` only — must be updated with the real production domain during Phase 11.
+- ~9 admin-only/table-thumbnail `<img>` usages and `Testimonials.tsx` (hardcoded fake data) not converted to `next/image` — deprioritized below the public-facing, real-content images.
 
 ## Deployment
 Not yet documented for this codebase's actual stack (SQLite dev / no queue worker manager / no Meilisearch). Phase 11 will produce a real WHM/cPanel + OpenLiteSpeed deployment runbook against the actual architecture above — the deployment steps in earlier drafts of this file (referencing Horizon, MySQL 8, S3) should not be used until Phase 11 replaces them with verified steps.
