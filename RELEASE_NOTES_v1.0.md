@@ -1,66 +1,50 @@
-# Uzair Portfolio DXP - Release Notes (v1.0.0)
+# Uzair Portfolio DXP — Release Notes (v1.0.0, in progress)
 
 ## Overview
-Welcome to the stable release of **v1.0.0**. This release marks the transition from development to a fully integrated, production-ready Digital Experience Platform (DXP). The architecture strictly decouples the headless Laravel backend from the Next.js React frontend, providing enterprise-grade scalability, security, and developer experience.
+This document tracks the actual, verified state of the Laravel + Next.js enterprise admin/CMS rebuild toward a v1.0.0 release. It supersedes the earlier draft of this file, which described infrastructure (Meilisearch, S3, Horizon, MySQL 8, Next.js 14) that was never actually wired up in this codebase — see "Actual Architecture" below for what's real.
 
-## Version
-- **Application Version:** `v1.0.0`
-- **Database Schema Version:** `v1.0`
-- **API Version:** `v1`
+**Status: NOT YET RELEASED.** Phase 10 (stabilization) is in progress; Phase 11 (production deployment) has not started.
 
-## Features Included in v1.0.0
-- **Headless CMS & Page Builder:** Fully dynamic blocks and pages integrated via `/api/v1/pages`.
-- **Media Library:** Centralized, AWS S3 / R2 ready media management with pickers.
-- **Enterprise CRM:** Lead ingestion, automation triggering, and CRM dashboard.
-- **Developer Portal:** Auto-generated OpenAPI specs via Scramble.
-- **Dynamic SEO & Search:** Lightning-fast global search using Meilisearch/Scout and dynamic JSON-LD injection.
-- **Live Chat & Notifications:** Real-time event notifications and dynamic LiveChat config injection.
+## Actual Architecture (verified, not aspirational)
+- **Backend:** Laravel 12.63, PHP 8.2/8.5, SQLite (dev) — no MySQL/Redis/Meilisearch/Horizon configured yet
+- **Frontend:** Next.js 16.2.10 (App Router, Turbopack), React 19, Tailwind CSS
+- **Data Layer:** TanStack React Query v5, Axios (`lib/api/client.ts`)
+- **Search:** Custom `DatabaseSearchDriver` (LIKE-based on SQLite, FULLTEXT on MySQL) — not Meilisearch/Scout
+- **Queue:** Database queue driver — not Horizon (Horizon setup is a Phase 11 deployment task)
 
-## Architecture
-- **Backend:** Laravel 11.x, PHP 8.3+, MySQL 8, Redis (Queues/Cache)
-- **Frontend:** Next.js 14 (App Router, Turbopack), Tailwind CSS, Framer Motion
-- **Data Layer:** TanStack React Query v5, Axios Interceptors (CSRF & JWT)
-- **Design Pattern:** Action/Repository Pattern (Backend), Service/Query Provider Pattern (Frontend)
+## Phase Status
 
-## Breaking Changes
-- **No Mocks:** All local mock JSON, hardcoded arrays, and `setTimeout` fakes have been permanently deleted.
-- **TanStack Query Enforcement:** Components can no longer make direct Axios calls; all data must pass through `useGenericCrud` or dedicated Query Hooks.
+| Phase | Status |
+|---|---|
+| Phase 1–8 (Core build: Dashboard, Homepage Builder, Media, Blog, Portfolio, Case Studies, Downloads, CRM, Newsletter, Automation, Notifications) | ✅ Complete |
+| Phase 9 (Public Dynamic Rendering) | ✅ Complete |
+| Phase 9.2 (Enterprise Admin Audit) | ✅ Complete |
+| Phase 9.3/9.4 (Content Verification + Settings) | ✅ Complete |
+| Phase 10.1 (ESLint / Type Safety / Dead Code) | ✅ Complete |
+| Phase 10.2 (Regression Audit) | ✅ Complete |
+| Phase 10.3 (Error Boundaries) | ✅ Complete |
+| Phase 10.4 (Loading/Empty/Error Consistency) | ✅ Complete |
+| Phase 10.5 (Performance/Accessibility/SEO/Security Hardening) | ▶ In progress |
+| Phase 10.6 (Final Production Audit) | ⏳ Pending |
+| Phase 11 (WHM/cPanel + OpenLiteSpeed Deployment) | ⏳ Pending |
 
-## Deployment Steps
-1. **Infrastructure Provisioning:** Ensure PHP 8.3, Node.js 20+, MySQL, and Redis are running.
-2. **Backend Setup:**
-   ```bash
-   composer install --no-dev --optimize-autoloader
-   php artisan key:generate
-   php artisan migrate:fresh --seed
-   php artisan storage:link
-   php artisan optimize
-   php artisan route:cache && php artisan view:cache
-   ```
-3. **Queue & Scheduler:**
-   ```bash
-   php artisan horizon # or start supervisor workers
-   # Add to crontab: * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
-   ```
-4. **Frontend Setup:**
-   ```bash
-   npm ci
-   npm run build
-   npm start
-   ```
+See `CHANGELOG.md` for per-phase detail and commit hashes.
 
-## Rollback Procedure
-1. Revert to the previous tag: `git checkout v0.9.x`
-2. Rollback migrations if necessary: `php artisan migrate:rollback --step=1`
-3. Flush Redis Cache: `php artisan cache:clear`
-4. Rebuild frontend: `npm run build && npm run start`
+## Verification Status (as of Phase 10.4)
+- Build: ✅ PASS
+- Lint: ✅ PASS (0 errors, 0 warnings)
+- Typecheck: ✅ PASS
+- Backend regression sweep (21 modules, curl-based): ✅ PASS
+- **Browser QA: ❌ NOT VERIFIED** — no browser automation tool available in this environment; all verification has been build/lint/typecheck/curl-level, never an actual rendered browser session. Do not treat this as browser-tested.
 
-## Known Limitations
-- S3 Storage integration relies on proper bucket permissions; local driver is default.
-- Next.js ISR (Incremental Static Regeneration) requires correct cache invalidation webhooks which are queued but might have a slight delay based on worker availability.
+## Known Issues (as of Phase 10.4)
+- Search "Rebuild Index" admin button is a no-op — `AbstractSearchDriver::rebuild()` is an empty stub. Per-record indexing (create/update/delete) works correctly.
+- Seeded Super Admin role has `uuid: null` (AdminSeeder uses Spatie's Role model directly, bypassing `App\Models\Role`'s UUID generation).
+- Navigation/Pages/Redirects admin pages are minimal stub forms (ID + Title only), not full per-module field editors.
+- Homepage Builder page doesn't distinguish a failed initial load from "no home page found."
 
-## Future Roadmap (v1.1 Milestone)
-- AI Assistant Integration for automated content generation.
-- Advanced personalization engine based on visitor analytics.
-- Multi-tenant architecture support.
-- Full CI/CD GitHub Actions pipelines for automated Playwright E2E suites.
+## Deployment
+Not yet documented for this codebase's actual stack (SQLite dev / no queue worker manager / no Meilisearch). Phase 11 will produce a real WHM/cPanel + OpenLiteSpeed deployment runbook against the actual architecture above — the deployment steps in earlier drafts of this file (referencing Horizon, MySQL 8, S3) should not be used until Phase 11 replaces them with verified steps.
+
+## Security note
+`database/seeders/AdminSeeder.php` no longer seeds a fixed admin/password pair in production — it requires an explicit `ADMIN_SEED_PASSWORD` env var, or is skipped entirely when `APP_ENV=production`.
