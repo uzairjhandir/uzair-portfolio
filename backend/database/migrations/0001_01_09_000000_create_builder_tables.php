@@ -9,10 +9,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->json('layout_settings')->nullable()->after('content');
-            $table->string('preview_token')->nullable()->after('status');
-            $table->foreignId('locked_by')->nullable()->constrained('users')->nullOnDelete()->after('preview_token');
-            $table->timestamp('locked_at')->nullable()->after('locked_by');
+            if (!Schema::hasColumn('pages', 'layout_settings')) {
+                $table->json('layout_settings')->nullable()->after('content');
+            }
+            // preview_token is already created by 0001_01_05_000000_create_pages_tables.php.
+            // A guarded re-add here used to fail on fresh SQLite installs: Schema::table()
+            // recreates the whole table when a constrained() column is queued in the same
+            // call, and that recreate path re-applies preview_token regardless of the
+            // hasColumn() guard, causing "duplicate column name" on migrate.
+            if (!Schema::hasColumn('pages', 'locked_by')) {
+                $table->foreignId('locked_by')->nullable()->constrained('users')->nullOnDelete()->after('status');
+            }
+            if (!Schema::hasColumn('pages', 'locked_at')) {
+                $table->timestamp('locked_at')->nullable()->after('locked_by');
+            }
         });
 
         Schema::create('builder_sessions', function (Blueprint $table) {
