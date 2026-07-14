@@ -35,7 +35,9 @@ return new class extends Migration
                 ['from_content_type', 'from_content_id', 'to_content_type', 'to_content_id', 'relation'],
                 'content_relations_unique'
             );
-            $table->index(['from_content_type', 'from_content_id', 'relation']);
+            // Explicit short name: the auto-generated name (66 chars) exceeds
+            // MySQL/MariaDB's 64-char identifier limit; fine on SQLite.
+            $table->index(['from_content_type', 'from_content_id', 'relation'], 'content_relations_from_lookup');
         });
     }
 
