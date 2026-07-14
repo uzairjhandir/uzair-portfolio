@@ -9,10 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Spatie\Permission\Traits\HasRoles;
 use App\Enums\UserStatus;
 
 // Spatie Packages (to be installed)
-// use Spatie\Permission\Traits\HasRoles;
 // use Spatie\Activitylog\Traits\LogsActivity;
 // use Spatie\Activitylog\LogOptions;
 // use Spatie\MediaLibrary\HasMedia;
@@ -20,10 +20,10 @@ use App\Enums\UserStatus;
 
 class User extends Authenticatable // implements HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuids;
-    
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuids, HasRoles;
+
     // Uncomment when Spatie is installed:
-    // use HasRoles, LogsActivity, InteractsWithMedia;
+    // use LogsActivity, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.

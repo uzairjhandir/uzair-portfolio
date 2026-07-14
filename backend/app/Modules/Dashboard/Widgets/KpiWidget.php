@@ -19,6 +19,7 @@ class KpiWidget extends AbstractDashboardWidget
 {
     public function key(): string      { return 'kpis'; }
     public function label(): string    { return 'Executive KPIs'; }
+    public function priority(): int    { return 10; }
     public function cacheTtl(): int    { return 60; }
     public function icon(): string     { return 'bar-chart-2'; }
     public function canExport(Authenticatable $user): bool { return $user->can('dashboard.export'); }

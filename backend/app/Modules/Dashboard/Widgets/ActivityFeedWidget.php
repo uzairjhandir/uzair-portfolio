@@ -29,31 +29,30 @@ class ActivityFeedWidget implements DashboardWidgetInterface
     public function collect(): array
     {
         $entries = DB::table('content_activity_logs as a')
-            ->leftJoin('users as u', 'u.id', '=', 'a.causer_id')
+            ->leftJoin('users as u', 'u.id', '=', 'a.user_id')
             ->orderByDesc('a.created_at')
             ->limit(20)
             ->select([
                 'a.id',
-                'a.log_name',
-                'a.description as action',
-                'a.subject_type',
-                'a.subject_id',
-                'a.properties',
+                'a.action',
+                'a.loggable_type as subject_type',
+                'a.loggable_id as subject_id',
+                'a.metadata',
                 'a.created_at',
-                DB::raw("CONCAT(u.name) as actor"),
+                'u.name as actor',
             ])
             ->get()
             ->map(function ($entry) {
-                $properties = json_decode($entry->properties ?? '{}', true);
+                $metadata = json_decode($entry->metadata ?? '{}', true);
 
                 return [
                     'id'           => $entry->id,
                     'action'       => $entry->action,
                     'subject_type' => class_basename($entry->subject_type ?? ''),
                     'subject_id'   => $entry->subject_id,
-                    'subject_label'=> $properties['attributes']['title'] ?? null,
+                    'subject_label'=> $metadata['title'] ?? null,
                     'actor'        => $entry->actor,
-                    'log_name'     => $entry->log_name,
+                    'log_name'     => $entry->action,
                     'at'           => $entry->created_at,
                 ];
             });

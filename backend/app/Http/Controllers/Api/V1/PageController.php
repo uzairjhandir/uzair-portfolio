@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\PageRepositoryInterface;
 use App\Services\PageService;
 use App\Http\Requests\Pages\CreatePageRequest;

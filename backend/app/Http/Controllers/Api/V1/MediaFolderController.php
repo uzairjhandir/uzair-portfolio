@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\MediaFolderRepositoryInterface;
 use App\Http\Resources\MediaFolderResource;
 use App\Models\MediaFolder;

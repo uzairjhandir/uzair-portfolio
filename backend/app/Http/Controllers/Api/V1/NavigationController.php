@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\NavigationRepositoryInterface;
 use App\Services\NavigationService;
 use App\Http\Requests\Navigation\ReorderNavigationRequest;
 use App\Http\Resources\NavigationItemResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class NavigationController extends Controller
 {
@@ -17,12 +18,24 @@ class NavigationController extends Controller
     ) {}
 
     // Public Endpoint for Next.js Frontend
-    public function showByLocation(string $location): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $location = $request->query('location');
+        if (!$location) {
+            abort(400, 'Location query parameter is required');
+        }
+
         $menu = $this->navigationService->getCachedMenuTree($location);
         
         if (!$menu) {
-            abort(404, 'Navigation menu not found');
+            return response()->json([
+                'success' => true,
+                'message' => 'Navigation retrieved successfully (empty)',
+                'data' => [
+                    'name' => ucfirst($location),
+                    'items' => [],
+                ]
+            ]);
         }
 
         return response()->json([

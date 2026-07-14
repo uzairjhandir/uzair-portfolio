@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\MediaRepositoryInterface;
 use App\Services\MediaService;
 use App\Http\Requests\Media\UploadMediaRequest;
