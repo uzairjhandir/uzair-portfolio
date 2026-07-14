@@ -8,23 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // UUID for external references
-            $table->uuid('uuid')->unique()->nullable()->after('id');
-
-            // Account status
-            $table->string('status')->default('active')->after('email_verified_at');
-
-            // Login tracking
-            $table->timestamp('last_login_at')->nullable()->after('status');
-            $table->string('last_login_ip', 45)->nullable()->after('last_login_at');
-        });
+        // No-op: uuid, status, last_login_at, and last_login_ip are already
+        // defined directly in 0001_01_01_000000_create_users_table.php.
+        // This migration predates that consolidation and was never cleaned
+        // up - on any fresh install it failed with "duplicate column name"
+        // for every one of these columns. Kept as a file (not deleted) so
+        // its migrations-table record on already-migrated databases still
+        // resolves to a real file.
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['uuid', 'status', 'last_login_at', 'last_login_ip']);
-        });
+        // No-op to match up(). See note above.
     }
 };
