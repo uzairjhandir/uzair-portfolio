@@ -51,7 +51,10 @@ return new class extends Migration
             $table->morphs('termable'); // termable_type, termable_id
             $table->integer('sort_order')->default(0);
 
-            $table->unique(['taxonomy_term_id', 'termable_type', 'termable_id']);
+            // Explicit short name: Laravel's auto-generated name for this column
+            // combination is 71 chars, over MySQL/MariaDB's 64-char identifier
+            // limit - silently fine on SQLite (no such limit), fails on MySQL.
+            $table->unique(['taxonomy_term_id', 'termable_type', 'termable_id'], 'taxonomy_termables_unique');
         });
     }
 
