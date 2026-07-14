@@ -9,6 +9,22 @@ admin/CMS rebuild — a different, later effort than the static-site
 entries under `[1.0.0] - 2026-07-09` below. See `RELEASE_NOTES_v1.0.md`
 for the full v1.0.0 status snapshot.
 
+### Repository Reconciliation — Category B runtime defects
+**Commit:** `9cdc6ea0`
+
+Fresh-clone verification (composer install → migrate → seed → npm run build) surfaced 124 files with real local-vs-committed content drift, not whitespace noise. Classified all 58 backend/frontend files remaining after the build-blocker fixes (see Phase 11 prep below) into A/B/C/D. Fixed all 9 Category B (runtime defects in currently-committed HEAD) as minimal, scoped patches — not blanket copies of local files, since several also carried unrelated Category C/D drift kept deferred:
+
+- `User.php` — added `HasRoles` (was commented out; `AuthServiceProvider`'s `Gate::before` already called `$user->hasRole()` on every permission check, fataling app-wide).
+- `NavigationController` — renamed `showByLocation()`→`index()` to match `routes/api.php`'s `Route::get('navigation', ..., 'index')`, which has no path segment.
+- `KpiWidget` — added missing `priority(): int` (interface contract violation, fataled on class load, broke the whole dashboard since it's singleton-bound).
+- `ActivityFeedWidget` — corrected SQL to the real `content_activity_logs` schema (`user_id`/`action`/`loggable_type`/`metadata`), not Spatie Activitylog's columns.
+- `BlockController`/`MediaController`/`MediaFolderController`/`PageController` — fixed base class (`Illuminate\Routing\Controller` → `App\Http\Controllers\Controller`) so `AuthorizesRequests`/`$this->authorize()` resolves; all 4 previously fataled on every protected call.
+- `tests/TestCase.php` — removed a reference to a `CreatesApplication` trait that doesn't exist anywhere in the repo; the entire test suite couldn't bootstrap.
+
+Verified on a fresh MySQL/MariaDB clone: `composer install` / `artisan about` / `route:list` / `artisan test` (41/42 pass — the 1 failure is a separate, newly-discovered, pre-existing bug: `RequestProfilerMiddleware` references an undefined `performance` log channel, out of this reconciliation's scope) / `npm run build` all pass. `/api/v1/navigation` now returns 200 (was 500). Block/Media/Page controllers now return 200 or a proper 403 (were fatal 500s).
+
+Category A = 0, Category B = 0. Category C (9, unwired feature work) and Category D (40, mostly BOM whitespace + same-pattern controllers with no live `authorize()` calls yet) intentionally deferred to v1.1 / a future cleanup pass.
+
 ### Phase 11 prep — Critical git-tracking fix + pre-deployment hardening
 **Commit:** `43d928eb`
 
