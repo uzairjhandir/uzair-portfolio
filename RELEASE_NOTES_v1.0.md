@@ -3,7 +3,7 @@
 ## Overview
 This document tracks the actual, verified state of the Laravel + Next.js enterprise admin/CMS rebuild toward a v1.0.0 release. It supersedes the earlier draft of this file, which described infrastructure (Meilisearch, S3, Horizon, MySQL 8, Next.js 14) that was never actually wired up in this codebase — see "Actual Architecture" below for what's real.
 
-**Status: NOT YET RELEASED.** Phase 10 (stabilization) is in progress; Phase 11 (production deployment) has not started.
+**Status: RC1 CODE FREEZE.** Tagged `v1.0.0-rc1-freeze` (not pushed). Category A (build blockers) and Category B (runtime defects) are both closed — see "RC1 Freeze Status" below. No further code changes planned except critical fixes discovered during Phase 11 deployment. Phase 11 (production deployment) has not started.
 
 ## Actual Architecture (verified, not aspirational)
 - **Backend:** Laravel 12.63, PHP 8.2/8.5, SQLite (dev) — no MySQL/Redis/Meilisearch/Horizon configured yet
@@ -26,9 +26,21 @@ This document tracks the actual, verified state of the Laravel + Next.js enterpr
 | Phase 10.4 (Loading/Empty/Error Consistency) | ✅ Complete |
 | Phase 10.5 (Performance/Accessibility/SEO/Security Hardening) | ✅ Complete |
 | Phase 10.6 (Final Production Audit) | ✅ Complete |
+| Repository Reconciliation (124-file local/git drift, Category A/B) | ✅ Complete |
 | Phase 11 (WHM/cPanel + OpenLiteSpeed Deployment) | ⏳ Pending |
 
 See `CHANGELOG.md` for per-phase detail and commit hashes.
+
+## RC1 Freeze Status
+Tag: `v1.0.0-rc1-freeze` at `1e0fe975` (local only, not pushed).
+
+- **Category A (build blockers): 0** — fresh clone builds clean (`npm run build`, zero errors).
+- **Category B (runtime defects in committed HEAD): 0** — all 9 found and fixed as minimal, scoped patches (see CHANGELOG "Repository Reconciliation"). Verified: `route:list`, `artisan test` (41/42 — 1 unrelated pre-existing issue, see Known Issues), `/api/v1/navigation` now 200 (was 500), Block/Media/Page/MediaFolder controllers no longer fatal.
+- **Category C (9, unwired feature work) and Category D (40, mostly BOM whitespace + refactoring)** — intentionally deferred to v1.1 / a future cleanup pass. Not blockers.
+
+### Database engine verification caveat
+- ✅ Fresh install verified: **MariaDB 10.4.32** (composer install → migrate → seed → build, all pass, 0 failures across 38 migrations).
+- 🟡 **Production compatibility: MySQL 8 deployment verification pending.** This environment only had MariaDB available, not true MySQL 8. Expected low risk (MariaDB 10.4 and MySQL 8 are close), but not yet empirically verified — re-run `composer install`/`migrate`/`db:seed` against real MySQL 8 on the production VPS before treating this leg as closed.
 
 ## Verification Status (as of Phase 10.6)
 - Build: ✅ PASS
@@ -50,14 +62,21 @@ See `CHANGELOG.md` for per-phase detail and commit hashes.
 - `PageResource::preview_url` reads `env('APP_FRONTEND_URL')` directly (bypasses config cache) and the var is unset in `.env` — preview links have been incomplete this whole project. Not fixed (out of Phase 10.6 scope; needs a config-file-backed env var and a value).
 - `routes/console.php` defines no `Schedule::` entries — nothing is actually scheduled. Decide before v1.0 whether anything (e.g. queue cleanup, expired-token pruning) needs one.
 - Dev database contains 5 real content records + 1 user from Phase 9.3 verification work — **must not be copied to production**; production needs a fresh `migrate` + guarded `AdminSeeder` run only.
-- DEPLOYMENT.md / BACKUP.md cover only the Next.js frontend deployment (PM2/cPanel Node app) — no Laravel backend deployment steps (PHP-FPM, composer install, queue worker, artisan cache commands). Needed before Phase 11.
-- OPERATIONS.md, SECURITY.md, DISASTER_RECOVERY.md, TROUBLESHOOTING.md, API_REFERENCE.md, INSTALL.md are single-line placeholder stubs, despite frontmatter claiming `status: Frozen (Production Ready)` — not actually production-ready documentation.
+- DEPLOYMENT.md now covers both halves (Laravel backend + Next.js frontend); OPERATIONS/SECURITY/DISASTER_RECOVERY/TROUBLESHOOTING/API_REFERENCE/INSTALL rewritten with real content (Phase 11 prep).
+- `RequestProfilerMiddleware` references a `performance` log channel that's never defined in `config/logging.php` — causes 1 test failure (`artisan test`, `TestCase.php` bootstrap fix surfaced this; it's a separate, previously-undiscovered, pre-existing bug). Not a Category B item for this reconciliation pass (doesn't crash the app, only that middleware's logging); flag for a future fix.
+- 49 files (Category C: 9, Category D: 40) still have real local-vs-git content drift beyond the 9 Category B fixes already resolved — deferred to v1.1, not blocking RC1.
 
 ## Phase 10.6 Security Fix
 - `GET /api/v1/health/details` was publicly accessible with no authentication, leaking PHP version, DB latency, disk paths, queue backlog, and SEO health scores. The route had a pre-existing `// Should be protected in prod` comment that was never acted on. Fixed by moving it behind `auth:sanctum`+`verified`; `live`/`ready`/`startup` remain public (needed for load-balancer/uptime probes, and expose no sensitive data).
 
 ## Deployment
-Not yet documented for this codebase's actual stack (SQLite dev / no queue worker manager / no Meilisearch). Phase 11 will produce a real WHM/cPanel + OpenLiteSpeed deployment runbook against the actual architecture above — the deployment steps in earlier drafts of this file (referencing Horizon, MySQL 8, S3) should not be used until Phase 11 replaces them with verified steps.
+See `DEPLOYMENT.md` (backend + frontend steps, written during Phase 11 prep). Phase 11 itself — actual WHM/cPanel + OpenLiteSpeed provisioning, DNS, SSL, real production `.env`, queue worker/Supervisor, mail, Browser QA, Lighthouse — has not started; requires production VPS access.
+
+### Phase 11 pre-flight checklist (code side, all pending)
+- [ ] Production VPS available
+- [ ] MySQL 8 fresh migrate + seed verification (currently only verified on MariaDB 10.4 — see caveat above)
+- [ ] Production `.env` finalized (`APP_ENV=production`, `APP_DEBUG=false`, real `APP_URL`/`APP_FRONTEND_URL`, `config/cors.php` updated from `localhost:3000`)
+- [ ] Browser QA + Lighthouse on the deployed domain (never possible in this environment — no browser tool available)
 
 ## Security note
 `database/seeders/AdminSeeder.php` no longer seeds a fixed admin/password pair in production — it requires an explicit `ADMIN_SEED_PASSWORD` env var, or is skipped entirely when `APP_ENV=production`.
