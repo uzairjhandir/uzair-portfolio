@@ -17,7 +17,10 @@ class PermissionService
         $permissions = PermissionEnum::values();
         
         foreach ($permissions as $permissionName) {
-            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'web']);
+            // guard_name must be 'sanctum' to match User::$guard_name and the
+            // roles seeded by DefaultRolesSeeder - a 'web'-guarded permission
+            // can never be given to a 'sanctum'-guarded role.
+            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'sanctum']);
         }
         
         $this->refreshCache();

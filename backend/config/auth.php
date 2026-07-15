@@ -42,6 +42,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Required for Spatie Permission: every route in this API runs
+        // behind auth:sanctum, and User::$guard_name is 'sanctum', but
+        // Spatie resolves valid guards for a model from this array, not
+        // just the property - without this entry every sanctum-guarded
+        // role/permission is rejected as a guard mismatch against User.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
     ],
 
     /*

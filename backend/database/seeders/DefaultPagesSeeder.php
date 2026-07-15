@@ -12,6 +12,15 @@ class DefaultPagesSeeder extends Seeder
     {
         $pages = [
             [
+                'title' => 'Home',
+                'slug' => 'home',
+                'template' => 'homepage',
+                'type' => 'page',
+                'status' => 'published',
+                'show_in_header' => false,
+                'show_in_footer' => false,
+            ],
+            [
                 'title' => 'About Us',
                 'slug' => 'about',
                 'template' => 'about',
@@ -65,9 +74,6 @@ class DefaultPagesSeeder extends Seeder
                     'sort_order' => $index,
                     'preview_token' => Str::random(32),
                     'publish_date' => now(),
-                    'blocks' => [
-                        ['type' => 'text', 'data' => ['text' => 'Default content for ' . $data['title']]]
-                    ]
                 ])
             );
         }

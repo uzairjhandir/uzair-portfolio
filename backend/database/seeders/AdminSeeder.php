@@ -41,8 +41,20 @@ class AdminSeeder extends Seeder
             // Create role if it doesn't exist
             $roleClass = \Spatie\Permission\Models\Role::class;
             if (class_exists($roleClass)) {
-                $roleClass::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'sanctum']);
-                $user->assignRole('Super Admin');
+                // roles.uuid is NOT NULL with no default (see migration
+                // 0001_01_02_000000_add_uuid_to_roles_and_permissions_table) -
+                // Spatie's own Role model has no UUID auto-generation, so it
+                // must be set explicitly here or this insert fails on MySQL.
+                $role = $roleClass::firstOrCreate(
+                    ['name' => 'Super Admin', 'guard_name' => 'sanctum'],
+                    ['uuid' => Str::uuid()->toString()]
+                );
+
+                // Pass the Role model, not its name: assignRole('Super Admin')
+                // resolves the guard via auth.defaults.guard ('web'), not the
+                // 'sanctum' guard this role and every API user actually use -
+                // passing the model bypasses that name+guard lookup entirely.
+                $user->assignRole($role);
             }
         }
 
