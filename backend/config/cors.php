@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000'],
+    // Was hardcoded to localhost:3000 only - driven by the same
+    // APP_FRONTEND_URL env var config('app.frontend_url') already uses
+    // elsewhere, so every environment (dev/staging/prod) is correct by
+    // just setting one env var instead of editing this file per-deploy.
+    'allowed_origins' => [config('app.frontend_url', 'http://localhost:3000')],
 
     'allowed_origins_patterns' => [],
 
