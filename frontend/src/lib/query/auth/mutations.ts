@@ -7,14 +7,17 @@ export const useLoginMutation = () => {
 
   return useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
-      // CSRF cookie setup for Laravel Sanctum
-      await apiClient.get('/sanctum/csrf-cookie', { baseURL: process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'http://localhost:8000' });
-      
+      // Bearer-only: no CSRF cookie needed
       const response = await apiClient.post('/auth/login', credentials);
       return response.data;
     },
-    onSuccess: () => {
-      // Invalidate the user query to refetch the fresh user data
+    onSuccess: (data) => {
+      // Store token in localStorage for Bearer auth
+      const token = data?.data?.token;
+      if (token && typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', token);
+      }
+      // Invalidate user query so /auth/me is re-fetched with the new token
       queryClient.invalidateQueries({ queryKey: authKeys.user() });
     },
   });
@@ -28,7 +31,11 @@ export const useLogoutMutation = () => {
       await apiClient.post('/auth/logout');
     },
     onSuccess: () => {
-      queryClient.clear(); // Clear all queries to prevent data leaking
+      // Remove token from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+      }
+      queryClient.clear();
       window.location.href = '/admin/login';
     },
   });
