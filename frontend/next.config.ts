@@ -44,6 +44,14 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+// Backend origin actually reachable from the Next.js server process. Set
+// this when the Laravel API isn't exposed on its own public host (e.g. a
+// single-domain WHM deployment where only this Next.js app has a web
+// server entry, and Laravel runs as an internal background process,
+// per DEPLOYMENT.md). Not NEXT_PUBLIC_* - the browser never talks to
+// this URL directly, only this rewrite proxy does, server-side.
+const backendInternalUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -62,6 +70,12 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+    ];
+  },
+  async rewrites() {
+    return [
+      { source: "/api/:path*", destination: `${backendInternalUrl}/api/:path*` },
+      { source: "/sanctum/:path*", destination: `${backendInternalUrl}/sanctum/:path*` },
     ];
   },
 };
