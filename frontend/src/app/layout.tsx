@@ -38,8 +38,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
+// Server-only context (generateMetadata always runs on the server) - talk
+// to the internal backend directly, same target next.config.ts's rewrite
+// proxies /api/* to, rather than a domain-specific public URL.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`;
 
 const DEFAULT_SITE_NAME = "Muhammad Uzair — Full Stack Web Developer & DevOps Engineer";
 const DEFAULT_DESCRIPTION = "Portfolio of Muhammad Uzair: WordPress Expert, Next.js Developer, and Linux Server Administrator. Building fast, secure, and high-converting web applications.";

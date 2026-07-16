@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
-// API Base URL (defaults to Laravel backend)
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Relative by default: /api/* is proxied through this same Next.js app to
+// Laravel (see next.config.ts rewrites), so the browser can always reach
+// the API at its own current origin + /api/v1 — no domain-specific env var
+// needed for any deployment (main domain, subdomain, custom domain)
+// without a rebuild. Server-side rendering has no "current origin" to
+// resolve a relative URL against, so it talks to the internal backend
+// directly instead (the same target the rewrite proxies to). Setting
+// NEXT_PUBLIC_API_URL explicitly still overrides both, for setups where
+// the API genuinely lives on a different origin.
+const isServer = typeof window === 'undefined';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (isServer
+    ? `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`
+    : '/api/v1');
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

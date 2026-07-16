@@ -6,7 +6,8 @@ import Link from "next/link";
 import axios from "axios";
 import { BlogPost } from "@/lib/query/blog/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Server-only context - talk to the internal backend directly.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`;
 
 async function getPost(slug: string): Promise<BlogPost | null> {
   try {
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   if (!post) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
 
   return {
     title: post.title,
@@ -90,7 +91,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     .filter((p) => p.slug !== post.slug)
     .slice(0, 3);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",

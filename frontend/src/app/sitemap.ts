@@ -1,7 +1,10 @@
 import { MetadataRoute } from 'next';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Server-only context (sitemap generation always runs on the server) - talk
+// to the internal backend directly, same target next.config.ts's rewrite
+// proxies /api/* to, rather than a domain-specific public URL.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`;
 
 async function fetchSlugs(endpoint: string): Promise<{ slug: string; updated_at?: string }[]> {
   try {
@@ -13,7 +16,7 @@ async function fetchSlugs(endpoint: string): Promise<{ slug: string; updated_at?
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://uzair.dev';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://uzair.dev';
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },

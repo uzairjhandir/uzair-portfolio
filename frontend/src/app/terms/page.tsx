@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { FadeIn } from "@/components/animations/FadeIn";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",

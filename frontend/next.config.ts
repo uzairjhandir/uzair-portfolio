@@ -76,6 +76,11 @@ const nextConfig: NextConfig = {
     return [
       { source: "/api/:path*", destination: `${backendInternalUrl}/api/:path*` },
       { source: "/sanctum/:path*", destination: `${backendInternalUrl}/sanctum/:path*` },
+      // Media/uploads (MediaController's storage:link target) - same gap
+      // as /api and /sanctum: nothing else serves this path in a
+      // single-domain deployment where only this Next.js app has a web
+      // server entry.
+      { source: "/storage/:path*", destination: `${backendInternalUrl}/storage/:path*` },
     ];
   },
 };

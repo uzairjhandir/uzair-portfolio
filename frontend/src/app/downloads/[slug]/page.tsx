@@ -3,7 +3,8 @@ import axios from "axios";
 import { DownloadDetailClient } from "./DownloadDetailClient";
 import { DownloadItem } from "@/lib/query/downloads/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Server-only context - talk to the internal backend directly.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`;
 
 async function getDownload(slug: string): Promise<DownloadItem | null> {
   try {
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!item) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
   const description = item.seo?.description || item.excerpt || '';
   const image = item.preview_image?.original_url || 'https://placehold.co/1200x630';
 

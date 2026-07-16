@@ -6,7 +6,8 @@ import Link from "next/link";
 import axios from "axios";
 import { CaseStudy } from "@/lib/query/case-studies/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Server-only context - talk to the internal backend directly.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:8000'}/api/v1`;
 
 async function getCaseStudy(slug: string): Promise<CaseStudy | null> {
   try {
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!study) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
   const description = study.seo?.description || study.excerpt || '';
   const image = study.featured_image?.original_url || 'https://placehold.co/1200x630';
 
@@ -74,7 +75,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
   const allStudies = await getAllCaseStudies();
   const relatedStudies = allStudies.filter((s) => s.slug !== study.slug).slice(0, 3);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uzair.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://uzair.dev";
   const creativeWorkJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
